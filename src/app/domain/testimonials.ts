@@ -1,4 +1,4 @@
 export interface Testimonials {
-    name: string;
-    comment: string;
+	name: string;
+	comment: string;
 }
