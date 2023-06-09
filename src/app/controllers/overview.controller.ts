@@ -10,7 +10,7 @@ export const findAll = async (
 	next: NextFunction
 ) => {
 	try {
-		const data = await overviewSchema.find({}).select('-__v');
+		const data = await overviewSchema.findOne({}).select('-__v');
 		return res.status(200).json({
 			message: 'Successfully retrieved!',
 			data,
