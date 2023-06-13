@@ -18,7 +18,7 @@ export const findAll = async (
 			.sort({ createdAt: -1 })
 			.exec()) as unknown as Product[];
 
-			console.log(data);
+		console.log(data);
 
 		if (data.length === 0) {
 			return res
@@ -73,7 +73,7 @@ export const create = async (
 			category: {
 				_id: category?._id,
 				name: category?.name,
-				description: category?.description
+				description: category?.description,
 			},
 			ingredients,
 			features,
@@ -83,13 +83,33 @@ export const create = async (
 			stock,
 		};
 
-		
-
 		const product: Product = await productSchema.create(newProduct);
 
 		return res.status(201).json({
 			message: 'Created!',
 			data: product,
+		});
+	} catch (error) {
+		return next(new AppError('Internal Server Error!', 500));
+	}
+};
+
+export const findById = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	const { id } = req.params;
+	const data = (await productSchema
+		.findById(id)
+		.select('-__v')
+		.populate('category')
+		.exec()) as unknown as Product;
+
+	try {
+		return res.status(200).json({
+			message: 'Data successfully retrieved',
+			data,
 		});
 	} catch (error) {
 		return next(new AppError('Internal Server Error!', 500));
