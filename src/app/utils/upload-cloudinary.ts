@@ -1,6 +1,6 @@
 import { UploadApiResponse, v2 as cloudinary } from 'cloudinary';
 
-export const uploadCloudinary = async (
+export const single = async (
 	filePath: string,
 	folder: string
 ): Promise<UploadApiResponse> => {
@@ -10,7 +10,7 @@ export const uploadCloudinary = async (
 	});
 };
 
-export const multipleUpload = async (filePaths: string[], folder: string) => {
+export const multiple = async (filePaths: string[], folder: string) => {
 	return await Promise.all(
 		filePaths.map((filePath) =>
 			cloudinary.uploader.upload(filePath, {
