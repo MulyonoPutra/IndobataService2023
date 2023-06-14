@@ -1,6 +1,6 @@
-import { Router } from "express";
-import { create, findAll, findById } from "../controllers/product.controller";
-import upload from "../middleware/upload-multer";
+import { Router } from 'express';
+import { create, findAll, findById } from '../controllers/product.controller';
+import upload from '../middleware/upload-multer';
 
 const router = Router();
 

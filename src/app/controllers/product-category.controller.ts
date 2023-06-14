@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import AppError from '../utils/app-error';
-import productCategorySchema from '../models/product-category.schema';
 import { ProductCategory } from '../domain/category';
+import productCategorySchema from '../models/product-category.schema';
+import AppError from '../utils/app-error';
 
 export const findAll = async (
 	req: Request,
@@ -9,10 +9,33 @@ export const findAll = async (
 	next: NextFunction
 ) => {
 	try {
-		const data = await productCategorySchema.find({}).select('-__v');
+		 // Get the page number from query parameters, default to 1 if not provided
+		const page = parseInt(req.query.page as string) || 1;
+
+		 // Get the limit (number of items per page) from query parameters, default to 10 if not provided
+		const limit = parseInt(req.query.limit as string) || 10;
+
+		 // Count the total number of documents / items
+		const count = await productCategorySchema.countDocuments({});
+
+		 // Calculate the total number of pages
+		const totalPages = Math.ceil(count / limit);
+
+		const skip = (page - 1) * limit;
+
+		const data = await productCategorySchema
+			.find({})
+			.select('-__v')
+			.sort({ createdAt: -1 })
+			.skip(skip)
+			.limit(limit);
+
 		return res.status(200).json({
 			message: 'Successfully retrieved!',
 			data,
+			page,
+			totalPages,
+			totalItems: count,
 		});
 	} catch (e) {
 		return next(new AppError('Internal Server Error!', 500));

@@ -13,9 +13,11 @@ export const findAll = async (
 		const data = await overviewSchema.findOne({}).select('-__v');
 
 		if (data === undefined || null) {
-			return res.status(400).json({ message: 'Data is empty, please create new data.' });
+			return res
+				.status(400)
+				.json({ message: 'Data is empty, please create new data.' });
 		}
-		
+
 		return res.status(200).json({
 			message: 'Successfully retrieved!',
 			data,
@@ -40,7 +42,9 @@ export const create = async (
 		// );
 
 		const multerFiles = req.files as Express.Multer.File[];
-		const filePath: string[] = multerFiles.map((file: Express.Multer.File) => file.path);
+		const filePath: string[] = multerFiles.map(
+			(file: Express.Multer.File) => file.path
+		);
 
 		const uploaded = await multiple(filePath, 'indobata');
 

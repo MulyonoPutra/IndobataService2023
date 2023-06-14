@@ -11,11 +11,27 @@ export const findAll = async (
 	next: NextFunction
 ) => {
 	try {
+		 // Get the page number from query parameters, default to 1 if not provided
+		const page = parseInt(req.query.page as string) || 1;
+
+		 // Get the limit (number of items per page) from query parameters, default to 10 if not provided
+		const limit = parseInt(req.query.limit as string) || 10;
+		
+		 // Count the total number of documents
+		const count = await productSchema.countDocuments({});
+		
+		 // Calculate the total number of pages
+		const totalPages = Math.ceil(count / limit);
+	
+		const skip = (page - 1) * limit; 
+
 		const data = (await productSchema
 			.find({})
 			.select('-__v')
 			.populate('category')
 			.sort({ createdAt: -1 })
+			.skip(skip)
+			.limit(limit)
 			.exec()) as unknown as Product[];
 
 		console.log(data);
@@ -29,6 +45,9 @@ export const findAll = async (
 		return res.status(200).json({
 			message: 'Successfully retrieved!',
 			data,
+			page,
+			totalPages,
+			totalItems: count,
 		});
 	} catch (e) {
 		return next(new AppError('Internal Server Error!', 500));
