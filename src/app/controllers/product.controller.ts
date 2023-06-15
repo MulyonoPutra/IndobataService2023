@@ -11,19 +11,19 @@ export const findAll = async (
 	next: NextFunction
 ) => {
 	try {
-		 // Get the page number from query parameters, default to 1 if not provided
+		// Get the page number from query parameters, default to 1 if not provided
 		const page = parseInt(req.query.page as string) || 1;
 
-		 // Get the limit (number of items per page) from query parameters, default to 10 if not provided
+		// Get the limit (number of items per page) from query parameters, default to 10 if not provided
 		const limit = parseInt(req.query.limit as string) || 10;
-		
-		 // Count the total number of documents
+
+		// Count the total number of documents
 		const count = await productSchema.countDocuments({});
-		
-		 // Calculate the total number of pages
+
+		// Calculate the total number of pages
 		const totalPages = Math.ceil(count / limit);
-	
-		const skip = (page - 1) * limit; 
+
+		const skip = (page - 1) * limit;
 
 		const data = (await productSchema
 			.find({})
@@ -33,8 +33,6 @@ export const findAll = async (
 			.skip(skip)
 			.limit(limit)
 			.exec()) as unknown as Product[];
-
-		console.log(data);
 
 		if (data.length === 0) {
 			return res
@@ -131,6 +129,37 @@ export const findById = async (
 			data,
 		});
 	} catch (error) {
+		return next(new AppError('Internal Server Error!', 500));
+	}
+};
+
+export const search = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	const { name } = req.query;
+
+	const query: any = {};
+
+	if (name) {
+		query.name = { $regex: name.toString(), $options: 'i' };
+	}
+
+	try {
+		const products: Product[] = await productSchema.find(query);
+
+		if (products.length === 0) {
+			return res
+				.status(400)
+				.json({ message: `Product with ${name} name is not found!` });
+		}
+
+		return res.status(200).json({
+			message: 'Data successfully retrieved',
+			products,
+		});
+	} catch (err) {
 		return next(new AppError('Internal Server Error!', 500));
 	}
 };
