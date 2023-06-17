@@ -70,7 +70,7 @@ const productSchema = new Schema<Product>(
 		price: {
 			type: Number,
 			required: true,
-		}
+		},
 	},
 	{ timestamps: true }
 );

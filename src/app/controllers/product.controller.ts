@@ -80,7 +80,7 @@ export const create = async (
 			applications,
 			technicalSpecifications,
 			stock,
-			price
+			price,
 		} = req.body;
 
 		const category = await productCategorySchema.findById(id);
@@ -99,7 +99,7 @@ export const create = async (
 			technicalSpecifications,
 			images: urls,
 			stock,
-			price
+			price,
 		};
 
 		const product: Product = await productSchema.create(newProduct);
@@ -172,24 +172,36 @@ export const findByCategoryId = async (
 	next: NextFunction
 ) => {
 	const { id } = req.params;
+	const page = parseInt(req.query.page as string) || 1;
+	const limit = parseInt(req.query.limit as string) || 10;
 	try {
-		const products: Product[] = await productSchema.find({
-			category: id
-		});
+		const count = await productSchema.countDocuments({ category: id });
+		const totalPages = Math.ceil(count / limit);
+
+		const products: Product[] = await productSchema
+			.find({
+				category: id,
+			})
+			.skip((page - 1) * limit) // Skip the appropriate number of documents based on the page number and limit
+			.limit(limit);
 
 		if (products.length === 0) {
-			return res.status(400).json({ message: `Product with category id ${id} is not found!` });
+			return res.status(400).json({
+				message: `Product with category id ${id} is not found!`,
+			});
 		}
 
 		return res.status(200).json({
 			message: 'Data successfully retrieved',
 			data: products,
+			page,
+			totalPages,
+			totalItems: count,
 		});
 	} catch (error) {
 		return next(new AppError('Internal Server Error!', 500));
 	}
 };
-
 
 /**
 	TODO: 

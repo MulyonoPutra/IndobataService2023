@@ -9,16 +9,16 @@ export const findAll = async (
 	next: NextFunction
 ) => {
 	try {
-		 // Get the page number from query parameters, default to 1 if not provided
+		// Get the page number from query parameters, default to 1 if not provided
 		const page = parseInt(req.query.page as string) || 1;
 
-		 // Get the limit (number of items per page) from query parameters, default to 10 if not provided
+		// Get the limit (number of items per page) from query parameters, default to 10 if not provided
 		const limit = parseInt(req.query.limit as string) || 10;
 
-		 // Count the total number of documents / items
+		// Count the total number of documents / items
 		const count = await productCategorySchema.countDocuments({});
 
-		 // Calculate the total number of pages
+		// Calculate the total number of pages
 		const totalPages = Math.ceil(count / limit);
 
 		const skip = (page - 1) * limit;
