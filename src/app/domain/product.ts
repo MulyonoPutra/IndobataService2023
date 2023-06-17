@@ -12,6 +12,7 @@ export interface Product extends Document {
 	technicalSpecifications: TechnicalSpecifications;
 	images: string[];
 	stock: number;
+	price: number;
 }
 
 export interface TechnicalSpecifications {

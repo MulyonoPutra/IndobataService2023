@@ -80,6 +80,7 @@ export const create = async (
 			applications,
 			technicalSpecifications,
 			stock,
+			price
 		} = req.body;
 
 		const category = await productCategorySchema.findById(id);
@@ -98,6 +99,7 @@ export const create = async (
 			technicalSpecifications,
 			images: urls,
 			stock,
+			price
 		};
 
 		const product: Product = await productSchema.create(newProduct);
@@ -157,9 +159,43 @@ export const search = async (
 
 		return res.status(200).json({
 			message: 'Data successfully retrieved',
-			products,
+			data: products,
 		});
 	} catch (err) {
 		return next(new AppError('Internal Server Error!', 500));
 	}
 };
+
+export const findByCategoryId = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	const { id } = req.params;
+	try {
+		const products: Product[] = await productSchema.find({
+			category: id
+		});
+
+		if (products.length === 0) {
+			return res.status(400).json({ message: `Product with category id ${id} is not found!` });
+		}
+
+		return res.status(200).json({
+			message: 'Data successfully retrieved',
+			data: products,
+		});
+	} catch (error) {
+		return next(new AppError('Internal Server Error!', 500));
+	}
+};
+
+
+/**
+	TODO: 
+	- Sort by newest
+	- Sort by oldest
+	- Sort by Price: low to high
+	- Sort by Price: high to low
+
+*/
