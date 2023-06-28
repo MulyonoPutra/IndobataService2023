@@ -17,13 +17,13 @@ export const findAll = async (
 
 		const skip = (page - 1) * limit;
 
-		const data = await projectSchema
+		const data = (await projectSchema
 			.find({})
 			.select('-__v')
 			.sort({ createdAt: -1 })
 			.skip(skip)
 			.limit(limit)
-            .exec() as Project[] ;
+			.exec()) as Project[];
 
 		return res.status(200).json({
 			message: 'Successfully retrieved!',
