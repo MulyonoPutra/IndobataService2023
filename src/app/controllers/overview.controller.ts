@@ -3,6 +3,7 @@ import { Overview } from '../domain/overview';
 import overviewSchema from '../models/overview.schema';
 import AppError from '../utils/app-error';
 import { multiple } from '../utils/upload-cloudinary';
+import { cache } from '../..';
 
 export const findAll = async (
 	req: Request,
@@ -10,8 +11,16 @@ export const findAll = async (
 	next: NextFunction
 ) => {
 	try {
+		const cached = cache.get('data');
+		if (cached) {
+			return res.status(200).json({
+				message: 'Successfully retrieved!',
+				data: cached,
+			});
+		}
+		
 		const data = await overviewSchema.findOne({}).select('-__v');
-
+		cache.set('data', data);
 		if (data === undefined || null) {
 			return res
 				.status(400)

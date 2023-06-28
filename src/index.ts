@@ -1,10 +1,11 @@
+import { v2 as cloudinary } from 'cloudinary';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express, { Express, Request, Response } from 'express';
 import routes from './app/routes';
 import { ConnectDb } from './config/connect-db';
-import { v2 as cloudinary } from 'cloudinary';
 import { Environment } from './config/environment';
+import NodeCache from 'node-cache';
 dotenv.config();
 
 const app: Express = express();
@@ -22,6 +23,8 @@ cloudinary.config({
 	api_secret: Environment.cloudinaryApiSecret,
 	secure: true,
 });
+
+export const cache = new NodeCache();
 
 app.use((err: any, req: Request, res: Response) => {
 	err.status = err.status || 'error';
