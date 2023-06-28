@@ -7,6 +7,7 @@ import productRoute from './product.route';
 import projectRoute from './project.route';
 import testimonialsRoute from './testimonials.route';
 import authRoute from './auth.route';
+import userRoute from './user.route';
 
 const routes = Router();
 
@@ -18,5 +19,6 @@ routes.use('/api/v1/overview', overviewRoute);
 routes.use('/api/v1/product', productRoute);
 routes.use('/api/v1/project', projectRoute);
 routes.use('/api/v1/auth', authRoute);
+routes.use('/api/v1/user', userRoute);
 
 export default routes;

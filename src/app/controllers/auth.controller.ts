@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { NextFunction, Request, Response } from 'express';
-import { User } from '../domain/user';
+import { User, UserDTO } from '../domain/user';
 import userSchema from '../models/user.schema';
 import AppError from '../utils/app-error';
 import { avatarGenerator } from '../utils/avatar-generator';
@@ -84,8 +84,20 @@ const loginSuccessful = async (user: User, password: string, res: Response) => {
 		// secure: true
 	});
 
+	const userDTO: UserDTO = {
+		_id: user._id,
+		username: user.username,
+		email: user.email,
+		role: user.role,
+		phone: user.phone,
+		dob: user.dob,
+		description: user.description,
+		avatar: user.avatar,
+		address: user.address,
+	};
+
 	return res.status(200).json({
 		message: 'Success',
-		data: { accessToken, user },
+		data: { accessToken, user: userDTO },
 	});
 };

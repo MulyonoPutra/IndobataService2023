@@ -44,6 +44,13 @@ const userSchema = new Schema<User>(
 			type: String,
 			required: false,
 		},
+		address: {
+			street: { type: String, required: false, default: '' },
+			provinces: { type: String, required: false, default: '' },
+			regencies: { type: String, required: false, default: '' },
+			districts: { type: String, required: false, default: '' },
+			villages: { type: String, required: false, default: '' },
+		},
 	},
 	{ timestamps: true }
 );
