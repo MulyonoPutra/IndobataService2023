@@ -24,7 +24,6 @@ export const authenticate = async (
 				token,
 				`${ACCESS_TOKEN_SECRET}`
 			) as Decoded;
-			console.log(decoded);
 
 			if (!decoded) {
 				return res

@@ -3,7 +3,6 @@ import { Overview } from '../domain/overview';
 import overviewSchema from '../models/overview.schema';
 import AppError from '../utils/app-error';
 import { multiple } from '../utils/upload-cloudinary';
-import { cache } from '../..';
 
 export const findAll = async (
 	req: Request,
@@ -11,20 +10,11 @@ export const findAll = async (
 	next: NextFunction
 ) => {
 	try {
-		const cached = cache.get('data');
-		if (cached) {
-			return res.status(200).json({
-				message: 'Successfully retrieved!',
-				data: cached,
-			});
-		}
-		
 		const data = await overviewSchema.findOne({}).select('-__v');
-		cache.set('data', data);
 		if (data === undefined || null) {
-			return res
-				.status(400)
-				.json({ message: 'Data is empty, please create new data.' });
+			return res.status(400).json({
+				message: 'Data is empty, please create new data.',
+			});
 		}
 
 		return res.status(200).json({
@@ -45,10 +35,6 @@ export const create = async (
 		if (!req.files || req.files.length === 0) {
 			return res.status(400).json({ message: 'No files uploaded!' });
 		}
-
-		// const filePaths: string[] = (req?.files as Express.Multer.File[]).map(
-		// 	(file: Express.Multer.File) => file.path
-		// );
 
 		const multerFiles = req.files as Express.Multer.File[];
 		const filePath: string[] = multerFiles.map(

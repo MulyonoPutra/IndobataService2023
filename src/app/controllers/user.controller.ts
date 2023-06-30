@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
+import { UserDTO } from '../domain/user';
 import userSchema from '../models/user.schema';
 import AppError from '../utils/app-error';
-import { single } from '../utils/upload-cloudinary';
-import { UserDTO } from '../domain/user';
+import { fields } from '../utils/upload-cloudinary';
 
 const hideAttributes = {
 	__v: 0,
@@ -61,40 +61,64 @@ export const update = async (
 	try {
 		const { id } = req.params;
 
-		if (!req.file) {
+		let user = await userSchema.findOne({ _id: id });
+
+		const files = req.files as {
+			[fieldname: string]: Express.Multer.File[];
+		};
+
+		if (!files || Object.keys(files).length === 0) {
 			return res.status(400).json({ message: 'No files uploaded!' });
 		}
 
-		let user = await userSchema.findOne({ _id: id });
+		const uploadedFiles = await fields(files, 'indobata/user');
 
-		const filePath: string = req.file.path;
+		if (uploadedFiles.length !== 2) {
+			return res
+				.status(400)
+				.json({
+					message: 'Please upload both an avatar and a cover image.',
+				});
+		}
 
-		const uploaded = await single(filePath, 'indobata/user');
+		const [avatar, cover] = uploadedFiles.map((url, index) => {
+			if (index === 0) {
+				return url;
+			} else if (index === 1) {
+				return url;
+			}
+		});
 
-		const url: string = uploaded.secure_url;
-
-		const updated: UserDTO = {
-			username: req.body.username,
-			phone: req.body.phone,
-			dob: req.body.dob,
-			description: req.body.description,
-			avatar: url,
-			address: {
-				street: req.body.address.street,
-				villages: req.body.address.villages,
-				districts: req.body.address.districts,
-				regencies: req.body.address.regencies,
-				provinces: req.body.address.provinces,
-			},
-		};
+		const updated: Partial<UserDTO> = updatedUser(req, avatar, cover);
 
 		user = await userSchema
-			.findOneAndUpdate({ _id: id }, updated, {
-				new: true,
-			})
+			.findOneAndUpdate({ _id: id }, updated, { new: true })
 			.select(hideProperties);
+
 		return res.status(200).json({ message: 'Success', data: user });
 	} catch (error) {
 		return next(new AppError('Internal Server Error!', 500));
 	}
 };
+
+function updatedUser(
+	req: Request,
+	avatar: string | undefined,
+	cover: string | undefined
+): Partial<UserDTO> {
+	return {
+		username: req.body.username,
+		phone: req.body.phone,
+		dob: req.body.dob,
+		description: req.body.description,
+		avatar: avatar,
+		cover: cover,
+		address: {
+			street: req.body.address.street,
+			villages: req.body.address.villages,
+			districts: req.body.address.districts,
+			regencies: req.body.address.regencies,
+			provinces: req.body.address.provinces,
+		},
+	};
+}

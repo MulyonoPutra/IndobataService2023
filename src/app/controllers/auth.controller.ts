@@ -93,6 +93,7 @@ const loginSuccessful = async (user: User, password: string, res: Response) => {
 		dob: user.dob,
 		description: user.description,
 		avatar: user.avatar,
+		cover: user.cover,
 		address: user.address,
 	};
 

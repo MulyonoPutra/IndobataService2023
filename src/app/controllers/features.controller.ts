@@ -9,7 +9,7 @@ export const findAll = async (
 	next: NextFunction
 ) => {
 	try {
-		const cached = cache.get('data');
+		const cached = cache.get('features');
 		if (cached) {
 			return res.status(200).json({
 				message: 'Successfully retrieved!',
@@ -18,7 +18,7 @@ export const findAll = async (
 		}
 
 		const data = await featuresSchema.find({}).select('-__v');
-		cache.set('data', data);
+		cache.set('features', data);
 		return res.status(200).json({
 			message: 'Successfully retrieved!',
 			data,
