@@ -1,5 +1,8 @@
 import { UploadApiResponse, v2 as cloudinary } from 'cloudinary';
 
+/**
+ * Upload single file to Cloudinary
+ */
 export const single = async (
 	filePath: string,
 	folder: string
@@ -10,6 +13,9 @@ export const single = async (
 	});
 };
 
+/**
+ * Upload multiple file to Cloudinary
+ */
 export const multiple = async (filePaths: string[], folder: string) => {
 	return await Promise.all(
 		filePaths.map((filePath) =>
@@ -21,8 +27,11 @@ export const multiple = async (filePaths: string[], folder: string) => {
 	);
 };
 
+/**
+ * Upload multiple file with different fields to Cloudinary
+ */
 export const fields = async (
-	files: {[fieldname: string]: Express.Multer.File[]},
+	files: { [fieldname: string]: Express.Multer.File[] },
 	folder: string
 ) => {
 	const field = Object.keys(files);
@@ -34,11 +43,23 @@ export const fields = async (
 						folder,
 						resource_type: 'auto',
 					});
-					return result.secure_url;
+					return {
+						id: result.public_id,
+						url: result.secure_url,
+					};
 				})
 			);
 
-			return uploaded.join(', ');
+			return uploaded;
 		})
+	);
+};
+
+/**
+ * Destroy / remove files from Cloudinary before upload
+ */
+export const destroy = async (publicIds: (string | null)[]) => {
+	await Promise.all(
+		publicIds.map((publicId) => cloudinary.uploader.destroy(publicId!))
 	);
 };

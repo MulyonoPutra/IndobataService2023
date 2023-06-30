@@ -30,7 +30,13 @@ export const register =
 				username,
 				email,
 				password: hashPassword,
-				avatar,
+				avatar: {
+					id: null,
+					url: avatar
+				},
+				cover: {
+					id: null
+				},
 				role,
 			}).save();
 

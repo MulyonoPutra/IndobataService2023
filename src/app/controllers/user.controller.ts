@@ -2,7 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 import { UserDTO } from '../domain/user';
 import userSchema from '../models/user.schema';
 import AppError from '../utils/app-error';
-import { fields } from '../utils/upload-cloudinary';
+import { destroy, fields } from '../utils/upload-cloudinary';
+import { sendResponse } from '../utils/send-response';
 
 const hideAttributes = {
 	__v: 0,
@@ -36,13 +37,14 @@ export const findById = async (
 	try {
 		const { id } = req.params;
 		const data = await userSchema.findOne({ _id: id }, hideAttributes);
-		return res.status(200).json({
-			message: 'Data successfully retrieved',
-			data,
-		});
+		return sendResponse(res, 200, 'Data successfully retrieved', data);
 	} catch (e) {
 		return next(new AppError('Internal Server Error!', 500));
 	}
+};
+
+type FileType = {
+	[fieldname: string]: Express.Multer.File[];
 };
 
 export const update = async (
@@ -50,50 +52,44 @@ export const update = async (
 	res: Response,
 	next: NextFunction
 ) => {
-	const hideProperties = [
-		'-createdAt',
-		'-updatedAt',
-		'-__v',
-		'-password',
-		'-refreshToken',
-	];
+	const hideProperties = [ '-createdAt', '-updatedAt', '-__v', '-password', '-refreshToken' ];
 
 	try {
 		const { id } = req.params;
 
-		let user = await userSchema.findOne({ _id: id });
-
-		const files = req.files as {
-			[fieldname: string]: Express.Multer.File[];
-		};
+		const files = req.files as FileType;
 
 		if (!files || Object.keys(files).length === 0) {
 			return res.status(400).json({ message: 'No files uploaded!' });
 		}
 
+		let user = await userSchema.findOne({ _id: id });
+
+		if (user !== null) {
+			const { cover, avatar } = user;
+			const coverPublicId = cover ? cover.id : null;
+			const avatarPublicId = avatar ? avatar.id : null;
+
+			const publicIds = [coverPublicId, avatarPublicId].filter(Boolean);
+
+			if (publicIds.length > 0) {
+				await destroy(publicIds);
+			}
+		}
+
 		const uploadedFiles = await fields(files, 'indobata/user');
 
 		if (uploadedFiles.length !== 2) {
-			return res
-				.status(400)
-				.json({
-					message: 'Please upload both an avatar and a cover image.',
-				});
+			return res.status(400).json({
+				message: 'Please upload both an avatar and a cover image.',
+			});
 		}
 
-		const [avatar, cover] = uploadedFiles.map((url, index) => {
-			if (index === 0) {
-				return url;
-			} else if (index === 1) {
-				return url;
-			}
-		});
+		const [ [{ id: avatarId, url: avatarUrl }], [{ id: coverId, url: coverUrl }] ] = uploadedFiles;
 
-		const updated: Partial<UserDTO> = updatedUser(req, avatar, cover);
+		const updated: Partial<UserDTO> = updatedUser(req, avatarId, avatarUrl, coverId, coverUrl);
 
-		user = await userSchema
-			.findOneAndUpdate({ _id: id }, updated, { new: true })
-			.select(hideProperties);
+		user = await userSchema.findOneAndUpdate({ _id: id }, updated, { new: true }).select(hideProperties);
 
 		return res.status(200).json({ message: 'Success', data: user });
 	} catch (error) {
@@ -103,16 +99,24 @@ export const update = async (
 
 function updatedUser(
 	req: Request,
-	avatar: string | undefined,
-	cover: string | undefined
+	avatarId: string,
+	avatarUrl: string,
+	coverId: string,
+	coverUrl: string
 ): Partial<UserDTO> {
 	return {
 		username: req.body.username,
 		phone: req.body.phone,
 		dob: req.body.dob,
 		description: req.body.description,
-		avatar: avatar,
-		cover: cover,
+		avatar: {
+			id: avatarId,
+			url: avatarUrl,
+		},
+		cover: {
+			id: coverId,
+			url: coverUrl,
+		},
 		address: {
 			street: req.body.address.street,
 			villages: req.body.address.villages,

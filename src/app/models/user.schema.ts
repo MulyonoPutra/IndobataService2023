@@ -41,13 +41,25 @@ const userSchema = new Schema<User>(
 			default: '',
 		},
 		avatar: {
-			type: String,
-			required: false,
+			id: {
+				type: String,
+				required: false,
+			},
+			url: {
+				type: String,
+				required: false,
+			},
 		},
 		cover: {
-			type: String,
-			required: false,
-			default: 'https://iconectiv.com/sites/default/files/2022-07/iconectiv%20main%20mobile.jpg',
+			id: {
+				type: String,
+				required: false,
+			},
+			url: {
+				type: String,
+				required: false,
+				default: 'https://iconectiv.com/sites/default/files/2022-07/iconectiv%20main%20mobile.jpg',
+			},
 		},
 		address: {
 			street: { type: String, required: false, default: '' },

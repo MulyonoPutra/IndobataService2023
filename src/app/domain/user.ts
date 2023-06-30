@@ -11,8 +11,14 @@ export interface User extends Document {
 	phone: number;
 	dob: string;
 	description: string;
-	avatar: string;
-	cover: string;
+	avatar: {
+		id: string;
+		url: string;
+	};
+	cover: {
+		id: string;
+		url: string;
+	};
 	address: Address;
 	_doc: object;
 }
@@ -37,7 +43,13 @@ export interface UserDTO {
 	phone: number;
 	dob: string;
 	description: string;
-	avatar: string;
-	cover: string;
+	avatar: {
+		id: string;
+		url: string;
+	};
+	cover: {
+		id: string;
+		url: string;
+	};
 	address: Address;
 }
