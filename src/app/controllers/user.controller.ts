@@ -20,10 +20,7 @@ export const findAll = async (
 ) => {
 	try {
 		const data = await userSchema.find({}, hideAttributes);
-		return res.status(200).json({
-			message: 'Successfully retrieved!',
-			data,
-		});
+		return sendResponse(res, 200, 'Data successfully retrieved', data);
 	} catch (e) {
 		return next(new AppError('Internal Server Error!', 500));
 	}
@@ -60,17 +57,17 @@ export const update = async (
 		const files = req.files as FileType;
 
 		if (!files || Object.keys(files).length === 0) {
-			return res.status(400).json({ message: 'No files uploaded!' });
+			return sendResponse(res, 400, 'No files uploaded!');
 		}
 
 		let user = await userSchema.findOne({ _id: id });
 
 		if (user !== null) {
 			const { cover, avatar } = user;
-			const coverPublicId = cover ? cover.id : null;
-			const avatarPublicId = avatar ? avatar.id : null;
+			const coverId = cover ? cover.id : null;
+			const avatarId = avatar ? avatar.id : null;
 
-			const publicIds = [coverPublicId, avatarPublicId].filter(Boolean);
+			const publicIds = [coverId, avatarId].filter(Boolean);
 
 			if (publicIds.length > 0) {
 				await destroy(publicIds);
@@ -80,9 +77,7 @@ export const update = async (
 		const uploadedFiles = await fields(files, 'indobata/user');
 
 		if (uploadedFiles.length !== 2) {
-			return res.status(400).json({
-				message: 'Please upload both an avatar and a cover image.',
-			});
+			return sendResponse(res, 400, 'Please upload both an avatar and a cover image.');
 		}
 
 		const [ [{ id: avatarId, url: avatarUrl }], [{ id: coverId, url: coverUrl }] ] = uploadedFiles;
@@ -91,7 +86,7 @@ export const update = async (
 
 		user = await userSchema.findOneAndUpdate({ _id: id }, updated, { new: true }).select(hideProperties);
 
-		return res.status(200).json({ message: 'Success', data: user });
+		return sendResponse(res, 200, 'Updated!', user);
 	} catch (error) {
 		return next(new AppError('Internal Server Error!', 500));
 	}
