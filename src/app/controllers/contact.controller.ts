@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import AppError from '../utils/app-error';
 import contactSchema from '../models/contact.schema';
+import { sendResponse } from '../utils/send-response';
 
 export const findAll = async (
 	req: Request,
@@ -9,10 +10,7 @@ export const findAll = async (
 ) => {
 	try {
 		const data = await contactSchema.find({}).select('-__v');
-		return res.status(200).json({
-			message: 'Successfully retrieved!',
-			data,
-		});
+		return sendResponse(res, 200, 'Data successfully retrieved', data);
 	} catch (e) {
 		return next(new AppError('Internal Server Error!', 500));
 	}

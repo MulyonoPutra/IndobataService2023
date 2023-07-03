@@ -57,8 +57,8 @@ export const login = async (
 	next: NextFunction
 ) => {
 	try {
-		const { username, password } = req.body;
-		const user = await userSchema.findOne({ username });
+		const { email, password } = req.body;
+		const user = await userSchema.findOne({ email });
 
 		if (!user) {
 			return res.status(400).json({

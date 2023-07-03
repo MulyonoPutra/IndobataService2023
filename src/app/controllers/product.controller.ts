@@ -4,6 +4,7 @@ import productCategorySchema from '../models/product-category.schema';
 import productSchema from '../models/product.schema';
 import AppError from '../utils/app-error';
 import { multiple } from '../utils/upload-cloudinary';
+import { sendResponse } from '../utils/send-response';
 
 export const findAll = async (
 	req: Request,
@@ -35,9 +36,7 @@ export const findAll = async (
 			.exec()) as unknown as Product[];
 
 		if (data.length === 0) {
-			return res
-				.status(400)
-				.json({ message: 'Data is empty, please create new data.' });
+			return sendResponse(res, 400, 'Data is empty, please create new data.');
 		}
 
 		return res.status(200).json({

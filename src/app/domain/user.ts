@@ -1,5 +1,6 @@
 import { Request } from 'express';
 import { Document } from 'mongoose';
+import { Address } from './address';
 
 export interface User extends Document {
 	_id?: string;
@@ -21,14 +22,6 @@ export interface User extends Document {
 	};
 	address: Address;
 	_doc: object;
-}
-
-export interface Address {
-	street: string;
-	provinces: string;
-	regencies: string;
-	districts: string;
-	villages: string;
 }
 
 export interface UserRequest extends Request {

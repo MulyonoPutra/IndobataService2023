@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import featuresSchema from '../models/features.schema';
 import AppError from '../utils/app-error';
 import { cache } from '../..';
+import { sendResponse } from '../utils/send-response';
 
 export const findAll = async (
 	req: Request,
@@ -19,10 +20,7 @@ export const findAll = async (
 
 		const data = await featuresSchema.find({}).select('-__v');
 		cache.set('features', data);
-		return res.status(200).json({
-			message: 'Successfully retrieved!',
-			data,
-		});
+		return sendResponse(res, 200, 'Data successfully retrieved', data);
 	} catch (e) {
 		return next(new AppError('Internal Server Error!', 500));
 	}
