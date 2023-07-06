@@ -49,7 +49,13 @@ export const update = async (
 	res: Response,
 	next: NextFunction
 ) => {
-	const hideProperties = [ '-createdAt', '-updatedAt', '-__v', '-password', '-refreshToken' ];
+	const hideProperties = [
+		'-createdAt',
+		'-updatedAt',
+		'-__v',
+		'-password',
+		'-refreshToken',
+	];
 
 	try {
 		const { id } = req.params;
@@ -77,14 +83,29 @@ export const update = async (
 		const uploadedFiles = await fields(files, 'indobata/user');
 
 		if (uploadedFiles.length !== 2) {
-			return sendResponse(res, 400, 'Please upload both an avatar and a cover image.');
+			return sendResponse(
+				res,
+				400,
+				'Please upload both an avatar and a cover image.'
+			);
 		}
 
-		const [ [{ id: avatarId, url: avatarUrl }], [{ id: coverId, url: coverUrl }] ] = uploadedFiles;
+		const [
+			[{ id: avatarId, url: avatarUrl }],
+			[{ id: coverId, url: coverUrl }],
+		] = uploadedFiles;
 
-		const updated: Partial<UserDTO> = updatedUser(req, avatarId, avatarUrl, coverId, coverUrl);
+		const updated: Partial<UserDTO> = updatedUser(
+			req,
+			avatarId,
+			avatarUrl,
+			coverId,
+			coverUrl
+		);
 
-		user = await userSchema.findOneAndUpdate({ _id: id }, updated, { new: true }).select(hideProperties);
+		user = await userSchema
+			.findOneAndUpdate({ _id: id }, updated, { new: true })
+			.select(hideProperties);
 
 		return sendResponse(res, 200, 'Updated!', user);
 	} catch (error) {
@@ -119,5 +140,7 @@ function updatedUser(
 			regencies: req.body.address.regencies,
 			provinces: req.body.address.provinces,
 		},
+		occupation: req.body.occupation,
+		company: req.body.company,
 	};
 }

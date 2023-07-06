@@ -32,10 +32,10 @@ export const register =
 				password: hashPassword,
 				avatar: {
 					id: null,
-					url: avatar
+					url: avatar,
 				},
 				cover: {
-					id: null
+					id: null,
 				},
 				role,
 			}).save();

@@ -7,6 +7,14 @@ const router = Router();
 
 router.get('/', authenticate, findAll);
 router.get('/:id', authenticate, findById);
-router.put('/:id', authenticate, upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'cover', maxCount: 1 }]), update);
+router.put(
+	'/:id',
+	authenticate,
+	upload.fields([
+		{ name: 'avatar', maxCount: 1 },
+		{ name: 'cover', maxCount: 1 },
+	]),
+	update
+);
 
 export default router;

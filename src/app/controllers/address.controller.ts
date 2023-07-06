@@ -1,8 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { Request, Response } from 'express';
+import { Environment } from '../../config/environment';
 import { errors, sendResponse } from '../utils/send-response';
-
-const { REGION_API } = process.env;
 
 export interface Errors extends AxiosError {
 	errors: unknown | never;
@@ -10,7 +9,9 @@ export interface Errors extends AxiosError {
 
 export const getProvinces = async (req: Request, res: Response) => {
 	try {
-		const response = await axios.get(`${REGION_API}/provinces.json`);
+		const response = await axios.get(
+			`${Environment.regionAPI}/provinces.json`
+		);
 		return sendResponse(
 			res,
 			200,
@@ -25,7 +26,9 @@ export const getProvinces = async (req: Request, res: Response) => {
 export const getRegencies = async (req: Request, res: Response) => {
 	const { id } = req.params;
 	try {
-		const response = await axios.get(`${REGION_API}/regencies/${id}.json`);
+		const response = await axios.get(
+			`${Environment.regionAPI}/regencies/${id}.json`
+		);
 
 		return sendResponse(
 			res,
@@ -41,7 +44,9 @@ export const getRegencies = async (req: Request, res: Response) => {
 export const getDistricts = async (req: Request, res: Response) => {
 	const { id } = req.params;
 	try {
-		const response = await axios.get(`${REGION_API}/districts/${id}.json`);
+		const response = await axios.get(
+			`${Environment.regionAPI}/districts/${id}.json`
+		);
 
 		return sendResponse(
 			res,
@@ -57,7 +62,9 @@ export const getDistricts = async (req: Request, res: Response) => {
 export const getVillages = async (req: Request, res: Response) => {
 	const { id } = req.params;
 	try {
-		const response = await axios.get(`${REGION_API}/villages/${id}.json`);
+		const response = await axios.get(
+			`${Environment.regionAPI}/villages/${id}.json`
+		);
 
 		return sendResponse(
 			res,

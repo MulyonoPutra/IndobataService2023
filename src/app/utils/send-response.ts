@@ -11,7 +11,10 @@ export function sendResponse(
 	res.status(status).json({ message, data });
 }
 
-export function errors(error: unknown, res: Response<any, Record<string, any>>) {
+export function errors(
+	error: unknown,
+	res: Response<any, Record<string, any>>
+) {
 	const errors = error as AxiosError;
 	return res.status(500).json({ errors } as Errors);
 }

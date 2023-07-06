@@ -26,7 +26,7 @@ const userSchema = new Schema<User>(
 		},
 		refreshToken: { type: String },
 		phone: {
-			type: Number,
+			type: String,
 			required: false,
 			default: null,
 		},
@@ -58,7 +58,8 @@ const userSchema = new Schema<User>(
 			url: {
 				type: String,
 				required: false,
-				default: 'https://iconectiv.com/sites/default/files/2022-07/iconectiv%20main%20mobile.jpg',
+				default:
+					'https://iconectiv.com/sites/default/files/2022-07/iconectiv%20main%20mobile.jpg',
 			},
 		},
 		address: {
@@ -67,6 +68,16 @@ const userSchema = new Schema<User>(
 			regencies: { type: String, required: false, default: '' },
 			districts: { type: String, required: false, default: '' },
 			villages: { type: String, required: false, default: '' },
+		},
+		occupation: {
+			type: String,
+			required: false,
+			default: '',
+		},
+		company: {
+			type: String,
+			required: false,
+			default: '',
 		},
 	},
 	{ timestamps: true }

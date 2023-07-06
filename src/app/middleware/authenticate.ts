@@ -1,10 +1,9 @@
 import { NextFunction, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import { Environment } from '../../config/environment';
 import { Decoded } from '../domain/decoded';
-import UserSchema from '../models/user.schema';
 import { UserRequest } from '../domain/user';
-
-const { ACCESS_TOKEN_SECRET } = process.env;
+import UserSchema from '../models/user.schema';
 
 export const authenticate = async (
 	req: UserRequest,
@@ -22,7 +21,7 @@ export const authenticate = async (
 
 			const decoded = jwt.verify(
 				token,
-				`${ACCESS_TOKEN_SECRET}`
+				`${Environment.accessTokenSecret}`
 			) as Decoded;
 
 			if (!decoded) {

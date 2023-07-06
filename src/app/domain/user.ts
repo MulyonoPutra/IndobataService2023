@@ -9,7 +9,7 @@ export interface User extends Document {
 	password: string;
 	role: string;
 	refreshToken: string;
-	phone: number;
+	phone: string;
 	dob: string;
 	description: string;
 	avatar: {
@@ -22,6 +22,8 @@ export interface User extends Document {
 	};
 	address: Address;
 	_doc: object;
+	occupation: string;
+	company: string;
 }
 
 export interface UserRequest extends Request {
@@ -33,7 +35,7 @@ export interface UserDTO {
 	username: string;
 	email?: string;
 	role?: string;
-	phone: number;
+	phone: string;
 	dob: string;
 	description: string;
 	avatar: {
@@ -45,4 +47,6 @@ export interface UserDTO {
 		url: string;
 	};
 	address: Address;
+	occupation: string;
+	company: string;
 }

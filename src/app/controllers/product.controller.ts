@@ -36,7 +36,11 @@ export const findAll = async (
 			.exec()) as unknown as Product[];
 
 		if (data.length === 0) {
-			return sendResponse(res, 400, 'Data is empty, please create new data.');
+			return sendResponse(
+				res,
+				400,
+				'Data is empty, please create new data.'
+			);
 		}
 
 		return res.status(200).json({

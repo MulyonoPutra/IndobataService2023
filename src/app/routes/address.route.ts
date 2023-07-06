@@ -1,12 +1,16 @@
-import { Router } from "express";
-import { getProvinces, getDistricts, getRegencies, getVillages } from "../controllers/address.controller";
-import { authenticate } from "../middleware/authenticate";
+import { Router } from 'express';
+import {
+	getDistricts,
+	getProvinces,
+	getRegencies,
+	getVillages,
+} from '../controllers/address.controller';
 
 const router = Router();
 
-router.get('/province', authenticate, getProvinces);
-router.get('/districts/:id', authenticate, getDistricts);
-router.get('/regencies/:id', authenticate, getRegencies);
-router.get('/villages/:id', authenticate, getVillages);
+router.get('/province', getProvinces);
+router.get('/districts/:id', getDistricts);
+router.get('/regencies/:id', getRegencies);
+router.get('/villages/:id', getVillages);
 
 export default router;
