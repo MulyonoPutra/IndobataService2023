@@ -58,8 +58,7 @@ const userSchema = new Schema<User>(
 			url: {
 				type: String,
 				required: false,
-				default:
-					'https://iconectiv.com/sites/default/files/2022-07/iconectiv%20main%20mobile.jpg',
+				default: 'https://iconectiv.com/sites/default/files/2022-07/iconectiv%20main%20mobile.jpg',
 			},
 		},
 		address: {

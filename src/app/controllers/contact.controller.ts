@@ -3,11 +3,7 @@ import AppError from '../utils/app-error';
 import contactSchema from '../models/contact.schema';
 import { sendResponse } from '../utils/send-response';
 
-export const findAll = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const findAll = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const data = await contactSchema.find({}).select('-__v');
 		return sendResponse(res, 200, 'Data successfully retrieved', data);
@@ -16,11 +12,7 @@ export const findAll = async (
 	}
 };
 
-export const create = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const create = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { fullname, phone, email, message } = req.body;
 		const newCategory = await contactSchema.create({

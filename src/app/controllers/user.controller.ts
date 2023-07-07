@@ -13,11 +13,7 @@ const hideAttributes = {
 	refreshToken: 0,
 };
 
-export const findAll = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const findAll = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const data = await userSchema.find({}, hideAttributes);
 		return sendResponse(res, 200, 'Data successfully retrieved', data);
@@ -26,11 +22,7 @@ export const findAll = async (
 	}
 };
 
-export const findById = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const findById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { id } = req.params;
 		const data = await userSchema.findOne({ _id: id }, hideAttributes);
@@ -44,18 +36,8 @@ type FileType = {
 	[fieldname: string]: Express.Multer.File[];
 };
 
-export const update = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
-	const hideProperties = [
-		'-createdAt',
-		'-updatedAt',
-		'-__v',
-		'-password',
-		'-refreshToken',
-	];
+export const update = async (req: Request, res: Response, next: NextFunction) => {
+	const hideProperties = ['-createdAt', '-updatedAt', '-__v', '-password', '-refreshToken'];
 
 	try {
 		const { id } = req.params;
@@ -83,29 +65,14 @@ export const update = async (
 		const uploadedFiles = await fields(files, 'indobata/user');
 
 		if (uploadedFiles.length !== 2) {
-			return sendResponse(
-				res,
-				400,
-				'Please upload both an avatar and a cover image.'
-			);
+			return sendResponse(res, 400, 'Please upload both an avatar and a cover image.');
 		}
 
-		const [
-			[{ id: avatarId, url: avatarUrl }],
-			[{ id: coverId, url: coverUrl }],
-		] = uploadedFiles;
+		const [[{ id: avatarId, url: avatarUrl }], [{ id: coverId, url: coverUrl }]] = uploadedFiles;
 
-		const updated: Partial<UserDTO> = updatedUser(
-			req,
-			avatarId,
-			avatarUrl,
-			coverId,
-			coverUrl
-		);
+		const updated: Partial<UserDTO> = updatedUser(req, avatarId, avatarUrl, coverId, coverUrl);
 
-		user = await userSchema
-			.findOneAndUpdate({ _id: id }, updated, { new: true })
-			.select(hideProperties);
+		user = await userSchema.findOneAndUpdate({ _id: id }, updated, { new: true }).select(hideProperties);
 
 		return sendResponse(res, 200, 'Updated!', user);
 	} catch (error) {

@@ -1,11 +1,5 @@
 import { Router } from 'express';
-import {
-	create,
-	findAll,
-	findByCategoryId,
-	findById,
-	search,
-} from '../controllers/product.controller';
+import { create, findAll, findByCategoryId, findById, search } from '../controllers/product.controller';
 import upload from '../middleware/upload-multer';
 
 const router = Router();

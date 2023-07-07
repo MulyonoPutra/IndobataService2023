@@ -1,11 +1,5 @@
 import { Router } from 'express';
-import {
-	create,
-	findAll,
-	findById,
-	remove,
-	update,
-} from '../controllers/product-category.controller';
+import { create, findAll, findById, remove, update } from '../controllers/product-category.controller';
 
 const router = Router();
 

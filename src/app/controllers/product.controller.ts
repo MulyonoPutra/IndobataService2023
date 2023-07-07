@@ -6,11 +6,7 @@ import AppError from '../utils/app-error';
 import { multiple } from '../utils/upload-cloudinary';
 import { sendResponse } from '../utils/send-response';
 
-export const findAll = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const findAll = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		// Get the page number from query parameters, default to 1 if not provided
 		const page = parseInt(req.query.page as string) || 1;
@@ -36,11 +32,7 @@ export const findAll = async (
 			.exec()) as unknown as Product[];
 
 		if (data.length === 0) {
-			return sendResponse(
-				res,
-				400,
-				'Data is empty, please create new data.'
-			);
+			return sendResponse(res, 400, 'Data is empty, please create new data.');
 		}
 
 		return res.status(200).json({
@@ -55,20 +47,14 @@ export const findAll = async (
 	}
 };
 
-export const create = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const create = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		if (!req.files || req.files.length === 0) {
 			return res.status(400).json({ message: 'No files uploaded!' });
 		}
 
 		const multerFiles = req.files as Express.Multer.File[];
-		const filePath: string[] = multerFiles.map(
-			(file: Express.Multer.File) => file.path
-		);
+		const filePath: string[] = multerFiles.map((file: Express.Multer.File) => file.path);
 
 		const uploaded = await multiple(filePath, 'indobata/product');
 
@@ -116,17 +102,9 @@ export const create = async (
 	}
 };
 
-export const findById = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const findById = async (req: Request, res: Response, next: NextFunction) => {
 	const { id } = req.params;
-	const data = (await productSchema
-		.findById(id)
-		.select('-__v')
-		.populate('category')
-		.exec()) as unknown as Product;
+	const data = (await productSchema.findById(id).select('-__v').populate('category').exec()) as unknown as Product;
 
 	try {
 		return res.status(200).json({
@@ -138,11 +116,7 @@ export const findById = async (
 	}
 };
 
-export const search = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const search = async (req: Request, res: Response, next: NextFunction) => {
 	const { name } = req.query;
 
 	const query: any = {};
@@ -155,9 +129,7 @@ export const search = async (
 		const products: Product[] = await productSchema.find(query);
 
 		if (products.length === 0) {
-			return res
-				.status(400)
-				.json({ message: `Product with ${name} name is not found!` });
+			return res.status(400).json({ message: `Product with ${name} name is not found!` });
 		}
 
 		return res.status(200).json({
@@ -169,11 +141,7 @@ export const search = async (
 	}
 };
 
-export const findByCategoryId = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const findByCategoryId = async (req: Request, res: Response, next: NextFunction) => {
 	const { id } = req.params;
 	const page = parseInt(req.query.page as string) || 1;
 	const limit = parseInt(req.query.limit as string) || 10;

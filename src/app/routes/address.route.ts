@@ -1,10 +1,5 @@
 import { Router } from 'express';
-import {
-	getDistricts,
-	getProvinces,
-	getRegencies,
-	getVillages,
-} from '../controllers/address.controller';
+import { getDistricts, getProvinces, getRegencies, getVillages } from '../controllers/address.controller';
 
 const router = Router();
 

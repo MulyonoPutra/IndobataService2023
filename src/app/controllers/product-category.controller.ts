@@ -3,11 +3,7 @@ import { ProductCategory } from '../domain/category';
 import productCategorySchema from '../models/product-category.schema';
 import AppError from '../utils/app-error';
 
-export const findAll = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const findAll = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		// Get the page number from query parameters, default to 1 if not provided
 		const page = parseInt(req.query.page as string) || 1;
@@ -42,16 +38,10 @@ export const findAll = async (
 	}
 };
 
-export const findById = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const findById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { id } = req.params;
-		const data = (await productCategorySchema
-			.findOne({ _id: id })
-			.select('-__v')) as unknown as ProductCategory;
+		const data = (await productCategorySchema.findOne({ _id: id }).select('-__v')) as unknown as ProductCategory;
 
 		return res.status(200).json({
 			message: 'Data successfully retrieved',
@@ -62,11 +52,7 @@ export const findById = async (
 	}
 };
 
-export const create = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const create = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { name, description } = req.body;
 		const newCategory = await productCategorySchema.create({
@@ -83,11 +69,7 @@ export const create = async (
 	}
 };
 
-export const remove = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const remove = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { id } = req.params;
 
@@ -100,11 +82,7 @@ export const remove = async (
 	}
 };
 
-export const update = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const update = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { id } = req.params;
 		const { name, description } = req.body;

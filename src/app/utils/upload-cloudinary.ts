@@ -3,10 +3,7 @@ import { UploadApiResponse, v2 as cloudinary } from 'cloudinary';
 /**
  * Upload single file to Cloudinary
  */
-export const single = async (
-	filePath: string,
-	folder: string
-): Promise<UploadApiResponse> => {
+export const single = async (filePath: string, folder: string): Promise<UploadApiResponse> => {
 	return await cloudinary.uploader.upload(filePath, {
 		folder,
 		resource_type: 'auto',
@@ -30,10 +27,7 @@ export const multiple = async (filePaths: string[], folder: string) => {
 /**
  * Upload multiple file with different fields to Cloudinary
  */
-export const fields = async (
-	files: { [fieldname: string]: Express.Multer.File[] },
-	folder: string
-) => {
+export const fields = async (files: { [fieldname: string]: Express.Multer.File[] }, folder: string) => {
 	const field = Object.keys(files);
 	return await Promise.all(
 		field.map(async (f) => {
@@ -59,7 +53,5 @@ export const fields = async (
  * Destroy / remove files from Cloudinary before upload
  */
 export const destroy = async (publicIds: (string | null)[]) => {
-	await Promise.all(
-		publicIds.map((publicId) => cloudinary.uploader.destroy(publicId!))
-	);
+	await Promise.all(publicIds.map((publicId) => cloudinary.uploader.destroy(publicId!)));
 };

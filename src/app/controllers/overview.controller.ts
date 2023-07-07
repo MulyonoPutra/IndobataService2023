@@ -5,11 +5,7 @@ import AppError from '../utils/app-error';
 import { multiple } from '../utils/upload-cloudinary';
 import { sendResponse } from '../utils/send-response';
 
-export const findAll = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const findAll = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const data = await overviewSchema.findOne({}).select('-__v');
 		if (data === undefined || null) {
@@ -24,20 +20,14 @@ export const findAll = async (
 	}
 };
 
-export const create = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const create = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		if (!req.files || req.files.length === 0) {
 			return res.status(400).json({ message: 'No files uploaded!' });
 		}
 
 		const multerFiles = req.files as Express.Multer.File[];
-		const filePath: string[] = multerFiles.map(
-			(file: Express.Multer.File) => file.path
-		);
+		const filePath: string[] = multerFiles.map((file: Express.Multer.File) => file.path);
 
 		const uploaded = await multiple(filePath, 'indobata');
 

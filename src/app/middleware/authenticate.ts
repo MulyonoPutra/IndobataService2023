@@ -5,11 +5,7 @@ import { Decoded } from '../domain/decoded';
 import { UserRequest } from '../domain/user';
 import UserSchema from '../models/user.schema';
 
-export const authenticate = async (
-	req: UserRequest,
-	res: Response,
-	next: NextFunction
-) => {
+export const authenticate = async (req: UserRequest, res: Response, next: NextFunction) => {
 	try {
 		const { authorization } = req.headers;
 
@@ -19,24 +15,15 @@ export const authenticate = async (
 				return res.status(400).json({ message: 'No Token Provided' });
 			}
 
-			const decoded = jwt.verify(
-				token,
-				`${Environment.accessTokenSecret}`
-			) as Decoded;
+			const decoded = jwt.verify(token, `${Environment.accessTokenSecret}`) as Decoded;
 
 			if (!decoded) {
-				return res
-					.status(400)
-					.json({ message: 'Invalid Authentication' });
+				return res.status(400).json({ message: 'Invalid Authentication' });
 			}
 
-			const user = await UserSchema.findOne({ _id: decoded.id }).select(
-				'-password'
-			);
+			const user = await UserSchema.findOne({ _id: decoded.id }).select('-password');
 			if (!user) {
-				return res
-					.status(400)
-					.json({ message: 'User does not exist.' });
+				return res.status(400).json({ message: 'User does not exist.' });
 			}
 
 			req.user = user;

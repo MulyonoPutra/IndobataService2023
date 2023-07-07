@@ -4,11 +4,7 @@ import projectSchema from '../models/project.schema';
 import AppError from '../utils/app-error';
 import { single } from '../utils/upload-cloudinary';
 
-export const findAll = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const findAll = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const page = parseInt(req.query.page as string) || 1;
 		const limit = parseInt(req.query.limit as string) || 10;
@@ -37,11 +33,21 @@ export const findAll = async (
 	}
 };
 
-export const create = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
+export const findById = async (req: Request, res: Response, next: NextFunction) => {
+	const { id } = req.params;
+	const data = (await projectSchema.findById(id).select('-__v').exec()) as unknown as Project;
+
+	try {
+		return res.status(200).json({
+			message: 'Data successfully retrieved',
+			data,
+		});
+	} catch (error) {
+		return next(new AppError('Internal Server Error!', 500));
+	}
+};
+
+export const create = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		if (!req.file) {
 			return res.status(400).json({ message: 'No files uploaded!' });

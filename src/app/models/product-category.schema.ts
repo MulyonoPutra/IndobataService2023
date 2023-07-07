@@ -12,7 +12,4 @@ const productCategorySchema = new Schema<ProductCategory>({
 	},
 });
 
-export default model<ProductCategory>(
-	'ProductByCategory',
-	productCategorySchema
-);
+export default model<ProductCategory>('ProductByCategory', productCategorySchema);
