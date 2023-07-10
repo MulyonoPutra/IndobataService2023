@@ -1,10 +1,11 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction } from 'express';
 import { Project } from '../domain/project';
 import projectSchema from '../models/project.schema';
+import { ProjectRequestType, ProjectResponseType } from '../type/project.type';
 import AppError from '../utils/app-error';
 import { single } from '../utils/upload-cloudinary';
 
-export const findAll = async (req: Request, res: Response, next: NextFunction) => {
+export const findAll = async (req: ProjectRequestType, res: ProjectResponseType, next: NextFunction) => {
 	try {
 		const page = parseInt(req.query.page as string) || 1;
 		const limit = parseInt(req.query.limit as string) || 10;
@@ -24,16 +25,18 @@ export const findAll = async (req: Request, res: Response, next: NextFunction) =
 		return res.status(200).json({
 			message: 'Successfully retrieved!',
 			data,
-			page,
-			totalPages,
-			totalItems: count,
+			paging: {
+				total: count,
+				totalPages: totalPages,
+				current: page,
+			},
 		});
 	} catch (e) {
 		return next(new AppError('Internal Server Error!', 500));
 	}
 };
 
-export const findById = async (req: Request, res: Response, next: NextFunction) => {
+export const findById = async (req: ProjectRequestType, res: ProjectResponseType, next: NextFunction) => {
 	const { id } = req.params;
 	const data = (await projectSchema.findById(id).select('-__v').exec()) as unknown as Project;
 
@@ -47,7 +50,7 @@ export const findById = async (req: Request, res: Response, next: NextFunction) 
 	}
 };
 
-export const create = async (req: Request, res: Response, next: NextFunction) => {
+export const create = async (req: ProjectRequestType, res: ProjectResponseType, next: NextFunction) => {
 	try {
 		if (!req.file) {
 			return res.status(400).json({ message: 'No files uploaded!' });

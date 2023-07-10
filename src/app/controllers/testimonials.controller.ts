@@ -2,8 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import testimonialsSchema from '../models/testimonials.schema';
 import AppError from '../utils/app-error';
 import { cache } from '../..';
+import { TestimonialsRequestType, TestimonialsResponseType } from '../type/testimonials.type';
 
-export const findAll = async (req: Request, res: Response, next: NextFunction) => {
+export const findAll = async (req: TestimonialsRequestType, res: TestimonialsResponseType, next: NextFunction) => {
 	try {
 		const cached = cache.get('testimonials');
 		if (cached) {
@@ -24,7 +25,7 @@ export const findAll = async (req: Request, res: Response, next: NextFunction) =
 	}
 };
 
-export const create = async (req: Request, res: Response, next: NextFunction) => {
+export const create = async (req: TestimonialsRequestType, res: TestimonialsResponseType, next: NextFunction) => {
 	try {
 		const { name, comment } = req.body;
 		const newCategory = await testimonialsSchema.create({

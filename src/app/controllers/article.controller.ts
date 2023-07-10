@@ -16,7 +16,7 @@ export const findAll = async (req: Request, res: Response, next: NextFunction) =
 		const count = await articleSchema.countDocuments({});
 		const totalPages = Math.ceil(count / limit);
 		const skip = (page - 1) * limit;
-		const data = await articleSchema
+		const data = (await articleSchema
 			.find({})
 			.populate('category')
 			.populate({
@@ -27,7 +27,7 @@ export const findAll = async (req: Request, res: Response, next: NextFunction) =
 			.sort({ createdAt: -1 })
 			.skip(skip)
 			.limit(limit)
-			.exec();
+			.exec()) as unknown as Article;
 
 		return res.status(200).json({
 			message: 'Successfully retrieved!',

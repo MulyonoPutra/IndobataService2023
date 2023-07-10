@@ -5,46 +5,48 @@ import userSchema from '../models/user.schema';
 import AppError from '../utils/app-error';
 import { avatarGenerator } from '../utils/avatar-generator';
 import { generateAccessToken, generateRefreshToken } from '../utils/generate-token';
+import { LoginRequestType, LoginResponseType, RegisterRequestType, RegisterResponseType } from '../type/auth.type';
 
-export const register = (role?: string) => async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		const { username, email, password } = req.body;
-		const users = await userSchema.findOne({ email });
+export const register =
+	(role?: string) => async (req: RegisterRequestType, res: RegisterResponseType, next: NextFunction) => {
+		try {
+			const { username, email, password } = req.body;
+			const users = await userSchema.findOne({ email });
 
-		if (users) {
-			return res.status(400).json({ message: 'User already exists!' });
+			if (users) {
+				return res.status(400).json({ message: 'User already exists!' });
+			}
+
+			const salt = await bcrypt.genSalt(Number(10));
+			const hashPassword = await bcrypt.hash(password, salt);
+			const avatar = avatarGenerator();
+
+			await new userSchema({
+				username,
+				email,
+				password: hashPassword,
+				avatar: {
+					id: null,
+					url: avatar,
+				},
+				cover: {
+					id: null,
+				},
+				role,
+			}).save();
+
+			const data = { username, email };
+
+			return res.status(200).json({
+				message: 'Success',
+				data,
+			});
+		} catch (e) {
+			return next(new AppError('Internal Server Error!', 500));
 		}
+	};
 
-		const salt = await bcrypt.genSalt(Number(10));
-		const hashPassword = await bcrypt.hash(password, salt);
-		const avatar = avatarGenerator();
-
-		await new userSchema({
-			username,
-			email,
-			password: hashPassword,
-			avatar: {
-				id: null,
-				url: avatar,
-			},
-			cover: {
-				id: null,
-			},
-			role,
-		}).save();
-
-		const data = { username, email };
-
-		return res.status(200).json({
-			message: 'Success',
-			data,
-		});
-	} catch (e) {
-		return next(new AppError('Internal Server Error!', 500));
-	}
-};
-
-export const login = async (req: Request, res: Response, next: NextFunction) => {
+export const login = async (req: LoginRequestType, res: LoginResponseType, next: NextFunction) => {
 	try {
 		const { email, password } = req.body;
 		const user = await userSchema.findOne({ email });
@@ -61,7 +63,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 	}
 };
 
-const loginSuccessful = async (user: User, password: string, res: Response) => {
+const loginSuccessful = async (user: User, password: string, res: LoginResponseType) => {
 	const isValid = await bcrypt.compare(password, user.password);
 
 	if (!isValid) {

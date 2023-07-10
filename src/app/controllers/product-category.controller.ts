@@ -2,8 +2,13 @@ import { NextFunction, Request, Response } from 'express';
 import { ProductCategory } from '../domain/category';
 import productCategorySchema from '../models/product-category.schema';
 import AppError from '../utils/app-error';
+import { ProductCategoryRequestType, ProductCategoryResponseType } from '../type/product-category.type';
 
-export const findAll = async (req: Request, res: Response, next: NextFunction) => {
+export const findAll = async (
+	req: ProductCategoryRequestType,
+	res: ProductCategoryResponseType,
+	next: NextFunction
+) => {
 	try {
 		// Get the page number from query parameters, default to 1 if not provided
 		const page = parseInt(req.query.page as string) || 1;
@@ -19,26 +24,32 @@ export const findAll = async (req: Request, res: Response, next: NextFunction) =
 
 		const skip = (page - 1) * limit;
 
-		const data = await productCategorySchema
+		const data = (await productCategorySchema
 			.find({})
 			.select('-__v')
 			.sort({ createdAt: -1 })
 			.skip(skip)
-			.limit(limit);
+			.limit(limit)) as unknown as ProductCategory;
 
 		return res.status(200).json({
 			message: 'Successfully retrieved!',
 			data,
-			page,
-			totalPages,
-			totalItems: count,
+			paging: {
+				total: count,
+				totalPages: totalPages,
+				current: page,
+			},
 		});
 	} catch (e) {
 		return next(new AppError('Internal Server Error!', 500));
 	}
 };
 
-export const findById = async (req: Request, res: Response, next: NextFunction) => {
+export const findById = async (
+	req: ProductCategoryRequestType,
+	res: ProductCategoryResponseType,
+	next: NextFunction
+) => {
 	try {
 		const { id } = req.params;
 		const data = (await productCategorySchema.findOne({ _id: id }).select('-__v')) as unknown as ProductCategory;
@@ -52,7 +63,7 @@ export const findById = async (req: Request, res: Response, next: NextFunction) 
 	}
 };
 
-export const create = async (req: Request, res: Response, next: NextFunction) => {
+export const create = async (req: ProductCategoryRequestType, res: ProductCategoryResponseType, next: NextFunction) => {
 	try {
 		const { name, description } = req.body;
 		const newCategory = await productCategorySchema.create({
@@ -69,7 +80,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 	}
 };
 
-export const remove = async (req: Request, res: Response, next: NextFunction) => {
+export const remove = async (req: ProductCategoryRequestType, res: ProductCategoryResponseType, next: NextFunction) => {
 	try {
 		const { id } = req.params;
 
@@ -82,7 +93,7 @@ export const remove = async (req: Request, res: Response, next: NextFunction) =>
 	}
 };
 
-export const update = async (req: Request, res: Response, next: NextFunction) => {
+export const update = async (req: ProductCategoryRequestType, res: ProductCategoryResponseType, next: NextFunction) => {
 	try {
 		const { id } = req.params;
 		const { name, description } = req.body;

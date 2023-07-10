@@ -25,7 +25,8 @@ export const findAll = async (req: Request, res: Response, next: NextFunction) =
 			.select('-__v')
 			.sort({ createdAt: -1 })
 			.skip(skip)
-			.limit(limit);
+			.limit(limit)
+			.exec();
 
 		return res.status(200).json({
 			message: 'Successfully retrieved!',

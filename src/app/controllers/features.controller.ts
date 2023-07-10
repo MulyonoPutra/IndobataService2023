@@ -3,8 +3,9 @@ import featuresSchema from '../models/features.schema';
 import AppError from '../utils/app-error';
 import { cache } from '../..';
 import { sendResponse } from '../utils/send-response';
+import { FeaturesRequestType, FeaturesResponseType } from '../type/features.type';
 
-export const findAll = async (req: Request, res: Response, next: NextFunction) => {
+export const findAll = async (req: FeaturesRequestType, res: FeaturesResponseType, next: NextFunction) => {
 	try {
 		const cached = cache.get('features');
 		if (cached) {
@@ -22,17 +23,17 @@ export const findAll = async (req: Request, res: Response, next: NextFunction) =
 	}
 };
 
-export const create = async (req: Request, res: Response, next: NextFunction) => {
+export const create = async (req: FeaturesRequestType, res: FeaturesResponseType, next: NextFunction) => {
 	try {
 		const { title, description } = req.body;
-		const newCategory = await featuresSchema.create({
+		const data = await featuresSchema.create({
 			title,
 			description,
 		});
 
 		return res.status(201).json({
 			message: 'New Category Created!',
-			data: newCategory,
+			data,
 		});
 	} catch (e) {
 		return next(new AppError('Internal Server Error!', 500));

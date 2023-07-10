@@ -1,11 +1,12 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction } from 'express';
 import { Overview } from '../domain/overview';
 import overviewSchema from '../models/overview.schema';
+import { OverviewRequestType, OverviewResponseType } from '../type/overview.type';
 import AppError from '../utils/app-error';
-import { multiple } from '../utils/upload-cloudinary';
 import { sendResponse } from '../utils/send-response';
+import { multiple } from '../utils/upload-cloudinary';
 
-export const findAll = async (req: Request, res: Response, next: NextFunction) => {
+export const findAll = async (req: OverviewRequestType, res: OverviewResponseType, next: NextFunction) => {
 	try {
 		const data = await overviewSchema.findOne({}).select('-__v');
 		if (data === undefined || null) {
@@ -20,7 +21,7 @@ export const findAll = async (req: Request, res: Response, next: NextFunction) =
 	}
 };
 
-export const create = async (req: Request, res: Response, next: NextFunction) => {
+export const create = async (req: OverviewRequestType, res: OverviewResponseType, next: NextFunction) => {
 	try {
 		if (!req.files || req.files.length === 0) {
 			return res.status(400).json({ message: 'No files uploaded!' });

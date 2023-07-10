@@ -1,12 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
+import { ProductCategory } from '../domain/category';
 import { Product } from '../domain/product';
 import productCategorySchema from '../models/product-category.schema';
 import productSchema from '../models/product.schema';
+import { ProductRequestType, ProductResponseType } from '../type/product.type';
 import AppError from '../utils/app-error';
-import { multiple } from '../utils/upload-cloudinary';
 import { sendResponse } from '../utils/send-response';
+import { multiple } from '../utils/upload-cloudinary';
 
-export const findAll = async (req: Request, res: Response, next: NextFunction) => {
+export const findAll = async (req: ProductRequestType, res: ProductResponseType, next: NextFunction) => {
 	try {
 		// Get the page number from query parameters, default to 1 if not provided
 		const page = parseInt(req.query.page as string) || 1;
@@ -38,9 +40,11 @@ export const findAll = async (req: Request, res: Response, next: NextFunction) =
 		return res.status(200).json({
 			message: 'Successfully retrieved!',
 			data,
-			page,
-			totalPages,
-			totalItems: count,
+			paging: {
+				total: count,
+				totalPages: totalPages,
+				current: page,
+			},
 		});
 	} catch (e) {
 		return next(new AppError('Internal Server Error!', 500));
@@ -72,7 +76,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 			price,
 		} = req.body;
 
-		const category = await productCategorySchema.findById(id);
+		const category: ProductCategory | null = await productCategorySchema.findById(id);
 
 		const newProduct = {
 			name,
@@ -173,12 +177,3 @@ export const findByCategoryId = async (req: Request, res: Response, next: NextFu
 		return next(new AppError('Internal Server Error!', 500));
 	}
 };
-
-/**
-	TODO: 
-	- Sort by newest
-	- Sort by oldest
-	- Sort by Price: low to high
-	- Sort by Price: high to low
-
-*/
