@@ -12,11 +12,11 @@ export interface User extends Document {
 	phone: string;
 	dob: string;
 	description: string;
-	avatar: {
+	avatar?: {
 		id: string;
 		url: string;
 	};
-	cover: {
+	cover?: {
 		id: string;
 		url: string;
 	};
@@ -32,21 +32,21 @@ export interface UserRequest extends Request {
 
 export interface UserDTO {
 	_id?: string;
-	username: string;
+	username?: string;
 	email?: string;
 	role?: string;
-	phone: string;
-	dob: string;
-	description: string;
-	avatar: {
+	phone?: string;
+	dob?: string;
+	description?: string;
+	avatar?: {
 		id: string;
 		url: string;
 	};
-	cover: {
+	cover?: {
 		id: string;
 		url: string;
 	};
-	address: Address;
-	occupation: string;
-	company: string;
+	address?: Address;
+	occupation?: string;
+	company?: string;
 }

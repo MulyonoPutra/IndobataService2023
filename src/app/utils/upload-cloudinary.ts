@@ -43,7 +43,6 @@ export const fields = async (files: { [fieldname: string]: Express.Multer.File[]
 					};
 				})
 			);
-
 			return uploaded;
 		})
 	);

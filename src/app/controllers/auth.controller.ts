@@ -91,7 +91,7 @@ const loginSuccessful = async (user: User, password: string, res: Response) => {
 		cover: user.cover,
 		address: user.address,
 		occupation: user.occupation,
-		company: user.company
+		company: user.company,
 	};
 
 	return res.status(200).json({

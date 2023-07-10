@@ -1,9 +1,10 @@
+import { v2 as cloudinary } from 'cloudinary';
 import { NextFunction, Request, Response } from 'express';
 import { UserDTO } from '../domain/user';
 import userSchema from '../models/user.schema';
 import AppError from '../utils/app-error';
-import { destroy, fields } from '../utils/upload-cloudinary';
 import { sendResponse } from '../utils/send-response';
+import { destroy } from '../utils/upload-cloudinary';
 
 const hideAttributes = {
 	__v: 0,
@@ -44,11 +45,13 @@ export const update = async (req: Request, res: Response, next: NextFunction) =>
 
 		const files = req.files as FileType;
 
-		if (!files || Object.keys(files).length === 0) {
-			return sendResponse(res, 400, 'No files uploaded!');
-		}
-
 		let user = await userSchema.findOne({ _id: id });
+		let updated: Partial<UserDTO>;
+
+		let avatarId!: 	string;
+		let avatarUrl!: string;
+		let coverId!: 	string;
+		let coverUrl!: 	string;
 
 		if (user !== null) {
 			const { cover, avatar } = user;
@@ -62,15 +65,30 @@ export const update = async (req: Request, res: Response, next: NextFunction) =>
 			}
 		}
 
-		const uploadedFiles = await fields(files, 'indobata/user');
+		if (files && files['avatar']) {
+			const avatarFile = files['avatar'][0];
 
-		if (uploadedFiles.length !== 2) {
-			return sendResponse(res, 400, 'Please upload both an avatar and a cover image.');
+			// Submit avatar file to Cloudinary
+			const avatarUploadResult = await cloudinary.uploader.upload(avatarFile.path, { folder: 'indobata/user' });
+
+			// Process the Cloudinary result for avatar
+			avatarId = avatarUploadResult.public_id;
+			avatarUrl = avatarUploadResult.secure_url;
+			updated = updatedUser(req, avatarId, avatarUrl);
+		}
+		if (files && files['cover']) {
+			const coverFile = files['cover'][0];
+
+			// Submit cover file to Cloudinary
+			const coverUploadResult = await cloudinary.uploader.upload(coverFile.path, { folder: 'indobata/user' });
+
+			// Process the Cloudinary result for cover
+			coverId = coverUploadResult.public_id;
+			coverUrl = coverUploadResult.secure_url;
+			updated = updatedUser(req, coverId, coverUrl);
 		}
 
-		const [[{ id: avatarId, url: avatarUrl }], [{ id: coverId, url: coverUrl }]] = uploadedFiles;
-
-		const updated: Partial<UserDTO> = updatedUser(req, avatarId, avatarUrl, coverId, coverUrl);
+		updated = updatedUser(req, avatarId, avatarUrl, coverId, coverUrl);
 
 		user = await userSchema.findOneAndUpdate({ _id: id }, updated, { new: true }).select(hideProperties);
 
@@ -81,33 +99,29 @@ export const update = async (req: Request, res: Response, next: NextFunction) =>
 };
 
 function updatedUser(
-	req: Request,
-	avatarId: string,
-	avatarUrl: string,
-	coverId: string,
-	coverUrl: string
+	req?: Request,
+	avatarId?: string,
+	avatarUrl?: string,
+	coverId?: string,
+	coverUrl?: string
 ): Partial<UserDTO> {
-	return {
-		username: req.body.username,
-		phone: req.body.phone,
-		dob: req.body.dob,
-		description: req.body.description,
-		avatar: {
+	const body: Partial<UserDTO> = {
+		...req?.body,
+	};
+
+	if (avatarId && avatarUrl) {
+		body.avatar = {
 			id: avatarId,
 			url: avatarUrl,
-		},
-		cover: {
+		};
+	}
+
+	if (coverId && coverUrl) {
+		body.cover = {
 			id: coverId,
 			url: coverUrl,
-		},
-		address: {
-			street: req.body.address.street,
-			villages: req.body.address.villages,
-			districts: req.body.address.districts,
-			regencies: req.body.address.regencies,
-			provinces: req.body.address.provinces,
-		},
-		occupation: req.body.occupation,
-		company: req.body.company,
-	};
+		};
+	}
+
+	return body;
 }
