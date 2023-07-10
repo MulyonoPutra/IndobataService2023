@@ -26,6 +26,16 @@ export interface User extends Document {
 	company: string;
 }
 
+export interface Cover {
+	id?: string;
+	url?: string;
+}
+
+export interface Avatar {
+	id?: string;
+	url?: string;
+}
+
 export interface UserRequest extends Request {
 	user?: User;
 }

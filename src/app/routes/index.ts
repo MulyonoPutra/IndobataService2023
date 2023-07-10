@@ -1,4 +1,7 @@
 import { Router } from 'express';
+import addressRoute from './address.route';
+import articleCategoryRoute from './article-category.route';
+import authRoute from './auth.route';
 import categoryRoute from './category.route';
 import contactRoutes from './contact.route';
 import featuresRoutes from './features.route';
@@ -6,9 +9,8 @@ import overviewRoute from './overview.route';
 import productRoute from './product.route';
 import projectRoute from './project.route';
 import testimonialsRoute from './testimonials.route';
-import authRoute from './auth.route';
 import userRoute from './user.route';
-import addressRoute from './address.route';
+import articleRoute from './article.route';
 
 const routes = Router();
 
@@ -22,5 +24,7 @@ routes.use('/api/v1/project', projectRoute);
 routes.use('/api/v1/auth', authRoute);
 routes.use('/api/v1/user', userRoute);
 routes.use('/api/v1/address', addressRoute);
+routes.use('/api/v1/article-category', articleCategoryRoute);
+routes.use('/api/v1/article', articleRoute);
 
 export default routes;

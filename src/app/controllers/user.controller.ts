@@ -1,10 +1,12 @@
 import { v2 as cloudinary } from 'cloudinary';
 import { NextFunction, Request, Response } from 'express';
-import { UserDTO } from '../domain/user';
+import { Avatar, Cover, UserDTO } from '../domain/user';
 import userSchema from '../models/user.schema';
 import AppError from '../utils/app-error';
 import { sendResponse } from '../utils/send-response';
+import { updateUserProcess } from '../utils/update-user';
 import { destroy } from '../utils/upload-cloudinary';
+import { FileType } from '../type/file.type';
 
 const hideAttributes = {
 	__v: 0,
@@ -33,10 +35,6 @@ export const findById = async (req: Request, res: Response, next: NextFunction) 
 	}
 };
 
-type FileType = {
-	[fieldname: string]: Express.Multer.File[];
-};
-
 export const update = async (req: Request, res: Response, next: NextFunction) => {
 	const hideProperties = ['-createdAt', '-updatedAt', '-__v', '-password', '-refreshToken'];
 
@@ -47,21 +45,16 @@ export const update = async (req: Request, res: Response, next: NextFunction) =>
 
 		let user = await userSchema.findOne({ _id: id });
 		let updated: Partial<UserDTO>;
-
-		let avatarId!: 	string;
-		let avatarUrl!: string;
-		let coverId!: 	string;
-		let coverUrl!: 	string;
+		let avatar!: Avatar;
+		let cover!: Cover;
 
 		if (user !== null) {
 			const { cover, avatar } = user;
 			const coverId = cover ? cover.id : null;
 			const avatarId = avatar ? avatar.id : null;
-
-			const publicIds = [coverId, avatarId].filter(Boolean);
-
-			if (publicIds.length > 0) {
-				await destroy(publicIds);
+			const publicId = [coverId, avatarId].filter(Boolean);
+			if (publicId.length > 0) {
+				await destroy(publicId);
 			}
 		}
 
@@ -72,9 +65,12 @@ export const update = async (req: Request, res: Response, next: NextFunction) =>
 			const avatarUploadResult = await cloudinary.uploader.upload(avatarFile.path, { folder: 'indobata/user' });
 
 			// Process the Cloudinary result for avatar
-			avatarId = avatarUploadResult.public_id;
-			avatarUrl = avatarUploadResult.secure_url;
-			updated = updatedUser(req, avatarId, avatarUrl);
+			avatar = {
+				id: avatarUploadResult.public_id,
+				url: avatarUploadResult.secure_url,
+			};
+
+			updated = updateUserProcess(req, avatar);
 		}
 		if (files && files['cover']) {
 			const coverFile = files['cover'][0];
@@ -83,12 +79,15 @@ export const update = async (req: Request, res: Response, next: NextFunction) =>
 			const coverUploadResult = await cloudinary.uploader.upload(coverFile.path, { folder: 'indobata/user' });
 
 			// Process the Cloudinary result for cover
-			coverId = coverUploadResult.public_id;
-			coverUrl = coverUploadResult.secure_url;
-			updated = updatedUser(req, coverId, coverUrl);
+			cover = {
+				id: coverUploadResult.public_id,
+				url: coverUploadResult.secure_url,
+			};
+
+			updated = updateUserProcess(req, cover);
 		}
 
-		updated = updatedUser(req, avatarId, avatarUrl, coverId, coverUrl);
+		updated = updateUserProcess(req, avatar, cover);
 
 		user = await userSchema.findOneAndUpdate({ _id: id }, updated, { new: true }).select(hideProperties);
 
@@ -97,31 +96,3 @@ export const update = async (req: Request, res: Response, next: NextFunction) =>
 		return next(new AppError('Internal Server Error!', 500));
 	}
 };
-
-function updatedUser(
-	req?: Request,
-	avatarId?: string,
-	avatarUrl?: string,
-	coverId?: string,
-	coverUrl?: string
-): Partial<UserDTO> {
-	const body: Partial<UserDTO> = {
-		...req?.body,
-	};
-
-	if (avatarId && avatarUrl) {
-		body.avatar = {
-			id: avatarId,
-			url: avatarUrl,
-		};
-	}
-
-	if (coverId && coverUrl) {
-		body.cover = {
-			id: coverId,
-			url: coverUrl,
-		};
-	}
-
-	return body;
-}
