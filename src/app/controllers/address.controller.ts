@@ -1,7 +1,8 @@
-import axios, { AxiosError } from 'axios';
-import { Request, Response } from 'express';
-import { Environment } from '../../config/environment';
+import axios from 'axios';
+import { Request } from 'express';
 import { errors, sendResponse } from '../utils/send-response';
+
+import { Environment } from '../../config/environment';
 import { AddressResponseType } from '../type/address.type';
 
 export const getProvinces = async (req: Request, res: AddressResponseType) => {

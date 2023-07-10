@@ -1,4 +1,5 @@
 import { NextFunction, Response } from 'express';
+
 import { UserRequest } from '../domain/user';
 
 export const authorities = (allowed: string) => (req: UserRequest, res: Response, next: NextFunction) => {

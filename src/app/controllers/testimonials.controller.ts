@@ -1,8 +1,9 @@
-import { NextFunction, Request, Response } from 'express';
+import { TestimonialsRequestType, TestimonialsResponseType } from '../type/testimonials.type';
+
+import { NextFunction } from 'express';
+import { cache } from '../..';
 import testimonialsSchema from '../models/testimonials.schema';
 import AppError from '../utils/app-error';
-import { cache } from '../..';
-import { TestimonialsRequestType, TestimonialsResponseType } from '../type/testimonials.type';
 
 export const findAll = async (req: TestimonialsRequestType, res: TestimonialsResponseType, next: NextFunction) => {
 	try {

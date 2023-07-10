@@ -1,5 +1,6 @@
-import { Router } from 'express';
 import { create, findAll, findById, remove } from '../controllers/article-category.controller';
+
+import { Router } from 'express';
 import { authenticate } from '../middleware/authenticate';
 
 const router = Router();

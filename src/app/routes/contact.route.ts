@@ -1,5 +1,6 @@
-import { Router } from 'express';
 import { create, findAll } from '../controllers/contact.controller';
+
+import { Router } from 'express';
 import { authenticate } from '../middleware/authenticate';
 import { authorities } from '../middleware/authorities';
 

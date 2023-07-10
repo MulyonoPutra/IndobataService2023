@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
+import { ProductRequestType, ProductResponseType } from '../type/product.type';
+
 import { ProductCategory } from '../domain/category';
 import { Product } from '../domain/product';
 import productCategorySchema from '../models/product-category.schema';
 import productSchema from '../models/product.schema';
-import { ProductRequestType, ProductResponseType } from '../type/product.type';
 import AppError from '../utils/app-error';
 import { sendResponse } from '../utils/send-response';
 import { multiple } from '../utils/upload-cloudinary';
@@ -24,14 +25,7 @@ export const findAll = async (req: ProductRequestType, res: ProductResponseType,
 
 		const skip = (page - 1) * limit;
 
-		const data = (await productSchema
-			.find({})
-			.select('-__v')
-			.populate('category')
-			.sort({ createdAt: -1 })
-			.skip(skip)
-			.limit(limit)
-			.exec()) as unknown as Product[];
+		const data = (await productSchema.find({}).select('-__v').populate('category').sort({ createdAt: -1 }).skip(skip).limit(limit).exec()) as unknown as Product[];
 
 		if (data.length === 0) {
 			return sendResponse(res, 400, 'Data is empty, please create new data.');

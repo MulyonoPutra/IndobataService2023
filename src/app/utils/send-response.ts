@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import { Response } from 'express';
-import { Errors } from '../controllers/address.controller';
+import { Errors } from '../domain/axios-error';
 
 export function sendResponse(res: Response, status: number, message: string, data?: any) {
 	res.status(status).json({ message, data });

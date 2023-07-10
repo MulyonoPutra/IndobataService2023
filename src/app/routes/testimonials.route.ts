@@ -1,5 +1,6 @@
-import { Router } from 'express';
 import { create, findAll } from '../controllers/testimonials.controller';
+
+import { Router } from 'express';
 
 const router = Router();
 

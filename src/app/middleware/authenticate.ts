@@ -1,4 +1,5 @@
 import { NextFunction, Response } from 'express';
+
 import jwt from 'jsonwebtoken';
 import { Environment } from '../../config/environment';
 import { Decoded } from '../domain/decoded';

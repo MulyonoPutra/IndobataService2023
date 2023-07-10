@@ -1,12 +1,13 @@
-import { v2 as cloudinary } from 'cloudinary';
 import { NextFunction, Request, Response } from 'express';
 import { Avatar, Cover, UserDTO } from '../domain/user';
+
+import { v2 as cloudinary } from 'cloudinary';
 import userSchema from '../models/user.schema';
+import { FileType } from '../type/file.type';
 import AppError from '../utils/app-error';
 import { sendResponse } from '../utils/send-response';
 import { updateUserProcess } from '../utils/update-user';
 import { destroy } from '../utils/upload-cloudinary';
-import { FileType } from '../type/file.type';
 
 const hideAttributes = {
 	__v: 0,

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import addressRoute from './address.route';
 import articleCategoryRoute from './article-category.route';
+import articleRoute from './article.route';
 import authRoute from './auth.route';
 import categoryRoute from './category.route';
 import contactRoutes from './contact.route';
@@ -10,7 +11,6 @@ import productRoute from './product.route';
 import projectRoute from './project.route';
 import testimonialsRoute from './testimonials.route';
 import userRoute from './user.route';
-import articleRoute from './article.route';
 
 const routes = Router();
 

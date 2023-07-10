@@ -1,7 +1,8 @@
-import { Router } from 'express';
 import { create, findAll, findById, remove } from '../controllers/article.controller';
-import upload from '../middleware/upload-multer';
+
+import { Router } from 'express';
 import { authenticate } from '../middleware/authenticate';
+import upload from '../middleware/upload-multer';
 
 const router = Router();
 

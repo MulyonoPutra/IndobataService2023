@@ -1,5 +1,6 @@
-import { Request } from 'express';
 import { Avatar, Cover, UserDTO } from '../domain/user';
+
+import { Request } from 'express';
 
 export function updateUserProcess(req?: Request, avatar?: Avatar, cover?: Cover): Partial<UserDTO> {
 	const body: Partial<UserDTO> = {

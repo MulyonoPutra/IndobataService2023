@@ -1,9 +1,10 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction } from 'express';
+import { FeaturesRequestType, FeaturesResponseType } from '../type/features.type';
+
+import { cache } from '../..';
 import featuresSchema from '../models/features.schema';
 import AppError from '../utils/app-error';
-import { cache } from '../..';
 import { sendResponse } from '../utils/send-response';
-import { FeaturesRequestType, FeaturesResponseType } from '../type/features.type';
 
 export const findAll = async (req: FeaturesRequestType, res: FeaturesResponseType, next: NextFunction) => {
 	try {

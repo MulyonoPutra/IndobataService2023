@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+
 import { ArticleCategory } from '../domain/article-category';
 import articlesCategorySchema from '../models/article-category.schema';
 import AppError from '../utils/app-error';
@@ -20,13 +21,7 @@ export const findAll = async (req: Request, res: Response, next: NextFunction) =
 
 		const skip = (page - 1) * limit;
 
-		const data = await articlesCategorySchema
-			.find({})
-			.select('-__v')
-			.sort({ createdAt: -1 })
-			.skip(skip)
-			.limit(limit)
-			.exec();
+		const data = await articlesCategorySchema.find({}).select('-__v').sort({ createdAt: -1 }).skip(skip).limit(limit).exec();
 
 		return res.status(200).json({
 			message: 'Successfully retrieved!',

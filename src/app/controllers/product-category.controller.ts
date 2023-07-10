@@ -1,14 +1,11 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction } from 'express';
+import { ProductCategoryRequestType, ProductCategoryResponseType } from '../type/product-category.type';
+
 import { ProductCategory } from '../domain/category';
 import productCategorySchema from '../models/product-category.schema';
 import AppError from '../utils/app-error';
-import { ProductCategoryRequestType, ProductCategoryResponseType } from '../type/product-category.type';
 
-export const findAll = async (
-	req: ProductCategoryRequestType,
-	res: ProductCategoryResponseType,
-	next: NextFunction
-) => {
+export const findAll = async (req: ProductCategoryRequestType, res: ProductCategoryResponseType, next: NextFunction) => {
 	try {
 		// Get the page number from query parameters, default to 1 if not provided
 		const page = parseInt(req.query.page as string) || 1;
@@ -24,12 +21,7 @@ export const findAll = async (
 
 		const skip = (page - 1) * limit;
 
-		const data = (await productCategorySchema
-			.find({})
-			.select('-__v')
-			.sort({ createdAt: -1 })
-			.skip(skip)
-			.limit(limit)) as unknown as ProductCategory;
+		const data = (await productCategorySchema.find({}).select('-__v').sort({ createdAt: -1 }).skip(skip).limit(limit)) as unknown as ProductCategory;
 
 		return res.status(200).json({
 			message: 'Successfully retrieved!',
@@ -45,11 +37,7 @@ export const findAll = async (
 	}
 };
 
-export const findById = async (
-	req: ProductCategoryRequestType,
-	res: ProductCategoryResponseType,
-	next: NextFunction
-) => {
+export const findById = async (req: ProductCategoryRequestType, res: ProductCategoryResponseType, next: NextFunction) => {
 	try {
 		const { id } = req.params;
 		const data = (await productCategorySchema.findOne({ _id: id }).select('-__v')) as unknown as ProductCategory;

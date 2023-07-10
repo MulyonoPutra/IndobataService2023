@@ -1,8 +1,9 @@
-import { NextFunction, Request, Response } from 'express';
-import AppError from '../utils/app-error';
-import contactSchema from '../models/contact.schema';
-import { sendResponse } from '../utils/send-response';
+import { NextFunction } from 'express';
 import { ContactRequestType, ContactResponseType } from '../type/contact.type';
+
+import contactSchema from '../models/contact.schema';
+import AppError from '../utils/app-error';
+import { sendResponse } from '../utils/send-response';
 
 export const findAll = async (req: ContactRequestType, res: ContactResponseType, next: NextFunction) => {
 	try {

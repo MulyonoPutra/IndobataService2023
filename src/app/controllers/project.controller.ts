@@ -1,7 +1,8 @@
+import { ProjectRequestType, ProjectResponseType } from '../type/project.type';
+
 import { NextFunction } from 'express';
 import { Project } from '../domain/project';
 import projectSchema from '../models/project.schema';
-import { ProjectRequestType, ProjectResponseType } from '../type/project.type';
 import AppError from '../utils/app-error';
 import { single } from '../utils/upload-cloudinary';
 
@@ -14,13 +15,7 @@ export const findAll = async (req: ProjectRequestType, res: ProjectResponseType,
 
 		const skip = (page - 1) * limit;
 
-		const data = (await projectSchema
-			.find({})
-			.select('-__v')
-			.sort({ createdAt: -1 })
-			.skip(skip)
-			.limit(limit)
-			.exec()) as Project[];
+		const data = (await projectSchema.find({}).select('-__v').sort({ createdAt: -1 }).skip(skip).limit(limit).exec()) as Project[];
 
 		return res.status(200).json({
 			message: 'Successfully retrieved!',
