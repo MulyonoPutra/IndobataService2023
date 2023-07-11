@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import { ProductRequestType, ProductResponseType } from '../type/product.type';
 
-import { ProductCategory } from '../domain/category';
+import AppError from '../utils/app-error';
 import { Product } from '../domain/product';
+import { ProductCategory } from '../domain/category';
+import { multiple } from '../utils/upload-cloudinary';
 import productCategorySchema from '../models/product-category.schema';
 import productSchema from '../models/product.schema';
-import AppError from '../utils/app-error';
 import { sendResponse } from '../utils/send-response';
-import { multiple } from '../utils/upload-cloudinary';
 
 export const findAll = async (req: ProductRequestType, res: ProductResponseType, next: NextFunction) => {
 	try {
@@ -25,7 +25,12 @@ export const findAll = async (req: ProductRequestType, res: ProductResponseType,
 
 		const skip = (page - 1) * limit;
 
-		const data = (await productSchema.find({}).select('-__v').populate('category').sort({ createdAt: -1 }).skip(skip).limit(limit).exec()) as unknown as Product[];
+		const data = (await productSchema.find({})
+			.select('-__v')
+			.populate('category')
+			.sort({ createdAt: -1 })
+			.skip(skip).limit(limit)
+			.exec()) as unknown as Product[];
 
 		if (data.length === 0) {
 			return sendResponse(res, 400, 'Data is empty, please create new data.');
@@ -163,9 +168,11 @@ export const findByCategoryId = async (req: Request, res: Response, next: NextFu
 		return res.status(200).json({
 			message: 'Data successfully retrieved',
 			data: products,
-			page,
-			totalPages,
-			totalItems: count,
+			paging: {
+				total: count,
+				totalPages: totalPages,
+				current: page,
+			},
 		});
 	} catch (error) {
 		return next(new AppError('Internal Server Error!', 500));

@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+
 import { Article } from '../domain/article';
 
 const articleSchema = new Schema<Article>(
@@ -23,4 +24,4 @@ const articleSchema = new Schema<Article>(
 	{ timestamps: true }
 );
 
-export default model<Article>('Blog', articleSchema);
+export default model<Article>('Article', articleSchema);

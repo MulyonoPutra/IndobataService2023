@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 
-import { v2 as cloudinary } from 'cloudinary';
+import AppError from '../utils/app-error';
 import { Article } from '../domain/article';
 import { UserRequest } from '../domain/user';
 import articleCategorySchema from '../models/article-category.schema';
 import articleSchema from '../models/article.schema';
-import AppError from '../utils/app-error';
+import { v2 as cloudinary } from 'cloudinary';
 import { hideUserProperties } from '../utils/hide-properties';
 import { sendResponse } from '../utils/send-response';
 import { single } from '../utils/upload-cloudinary';
@@ -28,7 +28,7 @@ export const findAll = async (req: Request, res: Response, next: NextFunction) =
 			.sort({ createdAt: -1 })
 			.skip(skip)
 			.limit(limit)
-			.exec()) as unknown as Article;
+			.exec()) as unknown as Article[];
 
 		return res.status(200).json({
 			message: 'Successfully retrieved!',
@@ -47,7 +47,10 @@ export const findAll = async (req: Request, res: Response, next: NextFunction) =
 export const findById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { id } = req.params;
-		const data = (await articleSchema.findOne({ _id: id }).select('-__v')) as unknown as Article;
+		const data = (await articleSchema.findOne({ _id: id }).select('-__v').populate('category').populate({
+			path: 'author',
+			select: hideUserProperties,
+		})) as unknown as Article;
 
 		return sendResponse(res, 200, 'Data successfully retrieved', data);
 	} catch (e) {

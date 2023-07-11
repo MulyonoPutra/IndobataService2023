@@ -1,9 +1,9 @@
 import { TestimonialsRequestType, TestimonialsResponseType } from '../type/testimonials.type';
 
+import AppError from '../utils/app-error';
 import { NextFunction } from 'express';
 import { cache } from '../..';
 import testimonialsSchema from '../models/testimonials.schema';
-import AppError from '../utils/app-error';
 
 export const findAll = async (req: TestimonialsRequestType, res: TestimonialsResponseType, next: NextFunction) => {
 	try {
@@ -29,14 +29,14 @@ export const findAll = async (req: TestimonialsRequestType, res: TestimonialsRes
 export const create = async (req: TestimonialsRequestType, res: TestimonialsResponseType, next: NextFunction) => {
 	try {
 		const { name, comment } = req.body;
-		const newCategory = await testimonialsSchema.create({
+		const data = await testimonialsSchema.create({
 			name,
 			comment,
 		});
 
 		return res.status(201).json({
 			message: 'New Category Created!',
-			data: newCategory,
+			data
 		});
 	} catch (e) {
 		return next(new AppError('Internal Server Error!', 500));
