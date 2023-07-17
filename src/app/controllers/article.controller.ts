@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import AppError from '../utils/app-error';
 import { Article } from '../domain/article';
+import { ArticlesResponseType } from '../type/article.type';
 import { UserRequest } from '../domain/user';
 import articleCategorySchema from '../models/article-category.schema';
 import articleSchema from '../models/article.schema';
@@ -91,18 +92,17 @@ export const create = async (req: UserRequest, res: Response, next: NextFunction
 			},
 		};
 
-		const data: Article = await articleSchema.create(article);
+		await articleSchema.create(article);
 
 		return res.status(201).json({
 			message: 'Created!',
-			data,
 		});
 	} catch (error) {
 		return next(new AppError('Internal Server Error!', 500));
 	}
 };
 
-export const remove = async (req: Request, res: Response, next: NextFunction) => {
+export const remove = async (req: Request, res: ArticlesResponseType, next: NextFunction) => {
 	try {
 		const { id } = req.params;
 
@@ -119,6 +119,108 @@ export const remove = async (req: Request, res: Response, next: NextFunction) =>
 			message: 'Data successfully removed',
 		});
 	} catch (e) {
+		return next(new AppError('Internal Server Error!', 500));
+	}
+};
+
+export const removeArticleByUserId = async (req: UserRequest, res: ArticlesResponseType, next: NextFunction) => {
+	try {
+		const { id } = req.params;
+
+		const article = await articleSchema.findById(id);
+
+		const publicId = article?.images.id;
+
+		if (publicId) {
+			await cloudinary.uploader.destroy(publicId);
+		}
+
+		await articleSchema.findByIdAndRemove({ _id: id, author: req.user?.id });
+		return res.status(200).json({
+			message: 'Data successfully removed',
+		});
+	} catch (e) {
+		return next(new AppError('Internal Server Error!', 500));
+	}
+};
+
+export const findArticleByUserId = async (req: Request, res: ArticlesResponseType, next: NextFunction) => {
+	try {
+		const userId = req.params.id;
+		const data = (await articleSchema
+			.find({ author: userId })
+			.populate('category')
+			.populate({
+				path: 'author',
+				select: hideUserProperties,
+			})
+			.select('-__v')
+			.exec()) as unknown as Article[];
+		return res.status(200).json({ message: 'Successfully!', data });
+	} catch (error) {
+		return next(new AppError('Internal Server Error!', 500));
+	}
+};
+
+export const findArticleByCategoryId = async (req: Request, res: ArticlesResponseType, next: NextFunction) => {
+	try {
+		const { id } = req.params;
+		const data = (await articleSchema
+			.find({ category: id })
+			.populate('category')
+			.populate({
+				path: 'author',
+				select: hideUserProperties,
+			})
+			.select('-__v')
+			.exec()) as unknown as Article[];
+
+		if (!data) {
+			return res.status(404).json({ message: `Article with category ${id} is not found` });
+		}
+
+		return res.status(200).json({ message: 'Successfully!', data });
+	} catch (error) {
+		return next(new AppError('Internal Server Error!', 500));
+	}
+};
+
+export const updateArticleByUserId = async (req: UserRequest, res: ArticlesResponseType, next: NextFunction) => {
+	try {
+		const articleId = req.params.id;
+		const filePath: string | undefined = req.file?.path;
+
+		const article = await articleSchema.findById(articleId);
+		const publicId = article?.images.id;
+		if (publicId) {
+			await cloudinary.uploader.destroy(publicId);
+		}
+
+		const uploaded = await single(filePath!, 'indobata/articles');
+		const url: string = uploaded.secure_url;
+		const imagesId: string = uploaded.public_id;
+
+		const {
+			category: { id },
+		} = req.body;
+
+		const category = await articleCategorySchema.findById(id);
+
+		const body: Partial<Article> = {
+			title: req.body.title,
+			subtitle: req.body.subtitle,
+			content: req.body.content,
+			tags: req.body.tags,
+			images: { id: imagesId, url: url },
+			category: { _id: category?._id },
+		};
+
+		await articleSchema.findOneAndUpdate({ _id: articleId, author: req.user?.id }, body);
+
+		return res.status(201).json({
+			message: 'Successfully Updated!',
+		});
+	} catch (error) {
 		return next(new AppError('Internal Server Error!', 500));
 	}
 };

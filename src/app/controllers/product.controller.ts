@@ -25,12 +25,7 @@ export const findAll = async (req: ProductRequestType, res: ProductResponseType,
 
 		const skip = (page - 1) * limit;
 
-		const data = (await productSchema.find({})
-			.select('-__v')
-			.populate('category')
-			.sort({ createdAt: -1 })
-			.skip(skip).limit(limit)
-			.exec()) as unknown as Product[];
+		const data = (await productSchema.find({}).select('-__v').populate('category').sort({ createdAt: -1 }).skip(skip).limit(limit).exec()) as unknown as Product[];
 
 		if (data.length === 0) {
 			return sendResponse(res, 400, 'Data is empty, please create new data.');

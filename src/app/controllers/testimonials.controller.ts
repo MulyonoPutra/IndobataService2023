@@ -36,7 +36,7 @@ export const create = async (req: TestimonialsRequestType, res: TestimonialsResp
 
 		return res.status(201).json({
 			message: 'New Category Created!',
-			data
+			data,
 		});
 	} catch (e) {
 		return next(new AppError('Internal Server Error!', 500));
