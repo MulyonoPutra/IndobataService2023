@@ -1,13 +1,13 @@
+import { Avatar, Cover, User, UserDTO } from '../domain/user';
 import { NextFunction, Request, Response } from 'express';
-import { Avatar, Cover, UserDTO } from '../domain/user';
 
-import { v2 as cloudinary } from 'cloudinary';
-import userSchema from '../models/user.schema';
-import { FileType } from '../type/file.type';
 import AppError from '../utils/app-error';
+import { FileType } from '../type/file.type';
+import { v2 as cloudinary } from 'cloudinary';
+import { destroy } from '../utils/upload-cloudinary';
 import { sendResponse } from '../utils/send-response';
 import { updateUserProcess } from '../utils/update-user';
-import { destroy } from '../utils/upload-cloudinary';
+import userSchema from '../models/user.schema';
 
 const hideAttributes = {
 	__v: 0,
@@ -44,7 +44,7 @@ export const update = async (req: Request, res: Response, next: NextFunction) =>
 
 		const files = req.files as FileType;
 
-		let user = await userSchema.findOne({ _id: id });
+		let user = await userSchema.findOne({ _id: id }) as User;
 		let updated: Partial<UserDTO>;
 		let avatar!: Avatar;
 		let cover!: Cover;
@@ -90,7 +90,7 @@ export const update = async (req: Request, res: Response, next: NextFunction) =>
 
 		updated = updateUserProcess(req, avatar, cover);
 
-		user = await userSchema.findOneAndUpdate({ _id: id }, updated, { new: true }).select(hideProperties);
+		user = await userSchema.findOneAndUpdate({ _id: id }, updated, { new: true }).select(hideProperties) as User;
 
 		return sendResponse(res, 200, 'Updated!', user);
 	} catch (error) {
