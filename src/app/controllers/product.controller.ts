@@ -151,7 +151,7 @@ export const findByCategoryId = async (req: Request, res: Response, next: NextFu
 			.find({
 				category: id,
 			})
-			.skip((page - 1) * limit) // Skip the appropriate number of documents based on the page number and limit
+			.skip((page - 1) * limit)
 			.limit(limit);
 
 		if (products.length === 0) {

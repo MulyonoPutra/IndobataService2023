@@ -1,8 +1,8 @@
-import { NextFunction } from 'express';
 import { ContactRequestType, ContactResponseType } from '../type/contact.type';
 
-import contactSchema from '../models/contact.schema';
 import AppError from '../utils/app-error';
+import { NextFunction } from 'express';
+import contactSchema from '../models/contact.schema';
 import { sendResponse } from '../utils/send-response';
 
 export const findAll = async (req: ContactRequestType, res: ContactResponseType, next: NextFunction) => {
@@ -18,10 +18,7 @@ export const create = async (req: ContactRequestType, res: ContactResponseType, 
 	try {
 		const { fullname, phone, email, message } = req.body;
 		const data = await contactSchema.create({
-			fullname,
-			phone,
-			email,
-			message,
+			fullname, phone, email, message,
 		});
 
 		return res.status(201).json({

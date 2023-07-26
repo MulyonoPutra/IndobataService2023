@@ -1,6 +1,5 @@
-import { ArticleCategory } from './article-category';
-import { User } from './user';
 import { Document } from 'mongoose';
+import { User } from './user';
 
 export interface Article extends Document {
 	_id?: string;
@@ -13,7 +12,11 @@ export interface Article extends Document {
 		id?: string;
 		url?: string;
 	};
-	category: ArticleCategory;
+	category: {
+		_id?: string;
+		name?: string;
+		description?: string;
+	};
 	_doc: object;
 }
 

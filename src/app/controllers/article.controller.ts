@@ -2,7 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 
 import AppError from '../utils/app-error';
 import { Article } from '../domain/article';
+import { ArticleCategory } from '../domain/article-category';
 import { ArticlesResponseType } from '../type/article.type';
+import { Images } from '../domain/images';
 import { UserRequest } from '../domain/user';
 import articleCategorySchema from '../models/article-category.schema';
 import articleSchema from '../models/article.schema';
@@ -185,42 +187,67 @@ export const findArticleByCategoryId = async (req: Request, res: ArticlesRespons
 	}
 };
 
-export const updateArticleByUserId = async (req: UserRequest, res: ArticlesResponseType, next: NextFunction) => {
+export const updateArticleByUserId = async (req: UserRequest, res: Response, next: NextFunction) => {
 	try {
-		const articleId = req.params.id;
+		const articleParams = req.params.id;
 		const filePath: string | undefined = req.file?.path;
+		let images!: Images;
+		let updated!: Partial<Article>;
 
-		const article = await articleSchema.findById(articleId);
+		const article = await articleSchema.findById(articleParams);
 		const publicId = article?.images.id;
+		
 		if (publicId) {
 			await cloudinary.uploader.destroy(publicId);
 		}
 
-		const uploaded = await single(filePath!, 'indobata/articles');
-		const url: string = uploaded.secure_url;
-		const imagesId: string = uploaded.public_id;
+		const categoryIdentity = req.body?.category?.id ?? null;
 
-		const {
-			category: { id },
-		} = req.body;
+		if (filePath) {
+			const uploaded = await single(filePath!, 'indobata/articles');
+			images = {
+				id: uploaded.public_id,
+				url: uploaded.secure_url,
+			};
+			updated = articleBody(req, images);
+		} else {
+			updated = articleBody(req);
+		}
 
-		const category = await articleCategorySchema.findById(id);
+		if (categoryIdentity) {
+			const category = (await articleCategorySchema.findById(categoryIdentity)) as ArticleCategory;
+			updated = articleBody(req, images, category);
+		}
 
-		const body: Partial<Article> = {
-			title: req.body.title,
-			subtitle: req.body.subtitle,
-			content: req.body.content,
-			tags: req.body.tags,
-			images: { id: imagesId, url: url },
-			category: { _id: category?._id },
-		};
-
-		await articleSchema.findOneAndUpdate({ _id: articleId, author: req.user?.id }, body);
+		await articleSchema.findOneAndUpdate({ _id: articleParams, author: req.user?.id }, updated, { new: true });
 
 		return res.status(201).json({
 			message: 'Successfully Updated!',
+			updated,
 		});
 	} catch (error) {
 		return next(new AppError('Internal Server Error!', 500));
 	}
 };
+
+export function articleBody(req?: Request, images?: Images, category?: ArticleCategory): Partial<Article> {
+	const body: Partial<Article> = {
+		...req?.body,
+	};
+
+	if (category) {
+		body.category = {
+			_id: category?._id,
+			name: category?.name,
+		};
+	}
+
+	if (images?.id && images?.url) {
+		body.images = {
+			id: images?.id,
+			url: images.url,
+		};
+	}
+
+	return body;
+}
