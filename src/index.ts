@@ -7,13 +7,22 @@ import NodeCache from 'node-cache';
 import routes from './app/routes';
 import { ConnectDb } from './config/connect-db';
 import { Environment } from './config/environment';
+
 dotenv.config();
 
 const app: Express = express();
 
 const port = process.env.PORT;
 
-app.use(cors());
+app.use(
+	cors({
+		origin: 'https://indobata2023-bpy89thsa-mulyonoputra.vercel.app',
+		methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+		allowedHeaders: ['Content-Type', 'Authorization'],
+		credentials: true,
+	})
+);
+
 app.use(express.json());
 app.use(routes);
 app.use(express.urlencoded({ extended: true }));
